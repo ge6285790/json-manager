@@ -1,0 +1,73 @@
+{
+  "name": "json-manager",
+  "version": "1.0.0",
+  "description": "json management",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ge6285790/json-manager.git"
+  },
+  "keywords": [
+    "json",
+    "manager",
+    "management",
+    "CRUD"
+  ],
+  "author": "ge6285790",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ge6285790/json-manager/issues"
+  },
+  "homepage": "https://github.com/ge6285790/json-manager#readme",
+  "devDependencies": {
+    "autoprefixer": "^6.6.1",
+    "babel-core": "^6.22.0",
+    "babel-loader": "^6.2.10",
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-polyfill": "^6.22.0",
+    "babel-preset-es2015": "^6.22.0",
+    "babel-preset-react": "^6.22.0",
+    "babel-preset-stage-0": "^6.22.0",
+    "babel-register": "^6.22.0",
+    "compass-mixins": "^0.12.10",
+    "cross-env": "^3.1.4",
+    "css-loader": "^0.26.1",
+    "enzyme": "^2.7.0",
+    "eslint": "^3.13.1",
+    "eslint-config-airbnb": "^14.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^3.0.2",
+    "eslint-plugin-react": "^6.9.0",
+    "express": "^4.14.0",
+    "file-loader": "^0.9.0",
+    "jest": "^18.1.0",
+    "json-loader": "^0.5.4",
+    "jsx-loader": "^0.13.2",
+    "mocha": "^3.2.0",
+    "node-sass": "^4.3.0",
+    "postcss-flexibility": "^1.1.0",
+    "postcss-loader": "^1.2.2",
+    "react-hot-loader": "^1.3.1",
+    "sass-loader": "^4.1.1",
+    "style-loader": "^0.13.1",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.14.0",
+    "webpack-dev-middleware": "^1.9.0",
+    "webpack-dev-server": "^1.16.2",
+    "webpack-hot-middleware": "^2.15.0"
+  },
+  "dependencies": {
+    "deep-equal": "^1.0.1",
+    "passport": "^0.3.2",
+    "passport-linkedin-oauth2": "^1.4.1",
+    "react": "^15.4.2",
+    "react-addons-update": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "react-modal": "^1.6.5",
+    "redux": "^3.6.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "cross-env NODE_ENV=development nodemon -r babel-register ./server/server.js"
+  }
+}
