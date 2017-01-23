@@ -1,4 +1,4 @@
-.object-block{
+.array-block{
   // text-indent: 1em;
   margin: 6px 0px;
   margin-left: 18px;
@@ -21,12 +21,10 @@
   }
   > div {
     margin-left: 18px;
-    .object-block{
-      .object-tail{
-        &:after{
-          content: ',';
-        }
-      }
+  }
+  .array-tail{
+    &:after{
+      content: ',';
     }
   }
 }

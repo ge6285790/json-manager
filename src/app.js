@@ -8,12 +8,26 @@ const option = {
   defaultData: {
     t: {
       b: {
-        cc: 'aa'
+        cc: 'aa',
       },
       v: {
-        aa: 'v'
-      }
-    }
+        aa: 'v',
+      },
+      a: [
+        'ccc',
+        'eee',
+        {
+          pp: {
+            bbbb: [
+              1,
+              'bb',
+              'rr',
+            ],
+          },
+          oooo: 'iii',
+        },
+      ],
+    },
   },
   addMethod: 'liberty', // inherit
 };

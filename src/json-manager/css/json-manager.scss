@@ -6,5 +6,37 @@
   right: 0px;
   left: 0px;
   position: absolute;
-  background: #ddd;
+  background: #fff;
+  overflow: scroll;
+  -webkit-font-smoothing: antialiased;
+  .string-child{
+    margin: 6px 0px 6px 36px;
+    .string-value{
+      // padding-left: 6px;
+      // color: #94AB49;
+      color: #0B7500;
+      &.padding-left{
+        padding-left: 6px;
+      }
+      &.value{
+        color: #1A01CC;
+      }
+    }
+  }
+  &[data-theme='dark']{
+    background: #282C34;
+    *{
+      color: #ABB2BF;
+    }
+    .string-child{
+      margin: 6px 0px 6px 36px;
+      .string-value{
+        // color: #94AB49;
+        color: #E5C076;
+        &.value{
+          color: #61AFEF;
+        }
+      }
+    }
+  }
 }
