@@ -3,6 +3,9 @@ import { render } from 'react-dom';
 import Main from './components/Main';
 import css from './css/json-manager.scss';
 
+import store from './store/store';
+import { Provider } from 'react-redux';
+
 function Jmgr(option, crud, elementId) {
   this.data = {
     option,
@@ -21,7 +24,12 @@ function Jmgr(option, crud, elementId) {
   };
 
   this.render = () => {
-    render(<Main data={this.data} />, document.getElementById(elementId));
+    render(
+      <Provider store={store}>
+        {/* <Main data={this.data} /> */}
+        <Main />
+      </Provider>,
+      document.getElementById(elementId));
   };
 }
 

@@ -9,11 +9,12 @@ class ObjectBlock extends Component {
   render() {
     let keyTitle = this.props.keyTitle || '';
     keyTitle = keyTitle === '' ? '{' : `"${keyTitle}": {`;
+    const { blockType, refernceFlag } = this.props;
     const { renderChild } = this.props.methods;
     return (
       <div className="object-block">
         <span>{keyTitle}</span>
-        {renderChild(this.props.data)}
+          {renderChild(this.props.data, blockType, refernceFlag)}
         <span className="object-tail">{'}'}</span>
       </div>
     );

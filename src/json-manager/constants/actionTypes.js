@@ -1,0 +1,2 @@
+export const JSON_DATA_GET = 'JSON_DATA_GET';
+export const JSON_DATA_UPDATE = 'JSON_DATA_UPDATE';

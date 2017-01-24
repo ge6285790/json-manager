@@ -9,6 +9,7 @@
   background: #fff;
   overflow: scroll;
   -webkit-font-smoothing: antialiased;
+  font-size: 14px;
   .string-child{
     margin: 6px 0px 6px 36px;
     .string-value{
@@ -21,6 +22,18 @@
       &.value{
         color: #1A01CC;
       }
+    }
+    #sim-input{
+      // -moz-appearance: textfield;
+      // -webkit-appearance: textfield;
+      // background-color: white;
+      // background-color: -moz-field;
+      // border: 1px solid darkgray;
+      // box-shadow: 1px 1px 1px 0 lightgray inset;
+      // font: -moz-field;
+      // font: -webkit-small-control;
+      // margin-top: 5px;
+      // padding: 2px 3px;
     }
   }
   &[data-theme='dark']{
@@ -36,6 +49,11 @@
         &.value{
           color: #61AFEF;
         }
+      }
+    }
+    .array-block, .object-block {
+      &:before{
+        opacity: 0.3;
       }
     }
   }
