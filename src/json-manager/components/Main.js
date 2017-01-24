@@ -20,6 +20,7 @@ console.error = (() => {
 
 function mapStateToProps(state) {
   return {
+    updateFlags: state.updateFlags,
     option: state.option,
     crud: state.crud,
   };
@@ -38,8 +39,10 @@ class Main extends Component {
     // console.log(props);
     this.renderChild = this.renderChild.bind(this);
     this.jsonDataUPDATE = this.jsonDataUPDATE.bind(this);
-    const { option, crud } = props;
+    const { option, crud, updateFlags } = props;
+    console.log(option.updateFlags)
     this.state = {
+      updateFlags: option.updateFlags,
       data: option.defaultData || {},
       crud,
     };
@@ -50,8 +53,9 @@ class Main extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { option, crud } = nextProps;
+    const { option, crud, updateFlags } = nextProps;
     this.state = {
+      updateFlags: option.updateFlags,
       data: option.defaultData || {},
       crud,
     };
@@ -108,6 +112,22 @@ class Main extends Component {
     const { actions, crud } = this.props;
     const { url, type, id, refernceFlag } = crud.update;
     console.log(`value: ${value}, flags: ${flags}, refernceFlag: ${refernceFlag}`);
+    const flagArray = flags.split('>');
+    const refernceFlagArray = refernceFlag.split('>');
+    console.log(flagArray, refernceFlagArray);
+    const updateFlagArray = refernceFlagArray.map((item, i) => {
+      // if (item === 'arrayIndex') {
+      //   return flagArray[i]
+      // }
+      // if (item === flagArray[i] || (item === 'arrayIndex' && parseInt(flagArray[i]) !== NaN)) {
+      //   return flagArray[i];
+      // }
+      if (item === 'arrayIndex' && parseInt(flagArray[i]) !== NaN) {
+        return flagArray[i];
+      }
+      return item;
+    });
+    console.log('updateFlagArray', updateFlagArray);
     // const data = new FormData();
     // data.append('json', JSON.stringify(updateData));
 
@@ -250,8 +270,14 @@ class Main extends Component {
   }
 
   render() {
-    const { data } = this.state;
+    const { data, updateFlags } = this.state;
     const blockType = Array.isArray(data) ? 'array' : 'default';
+    console.log('updateFlags', updateFlags, this.state);
+    let refernceFlagInputValue = '';
+    if (updateFlags.length !== 0) {
+      refernceFlagInputValue = updateFlags.reduce((prev, next) => `${prev}, ${next}`);
+    }
+    console.log('refernceFlagInputValue',refernceFlagInputValue)
     return (
       <div className="json-manager" data-theme="dark">
         <ObjectBlock
@@ -259,6 +285,14 @@ class Main extends Component {
           methods={{ renderChild: this.renderChild }}
           blockType={blockType}
         />
+      <div className="settingMenu">
+        <ul>
+          <li></li>
+          <li>
+            <input className="refernceFlagInput" placeholder="Choice the key..." value={refernceFlagInputValue} />
+          </li>
+        </ul>
+      </div>
       </div>
     );
   }

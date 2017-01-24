@@ -59,9 +59,11 @@
   },
   "dependencies": {
     "deep-equal": "^1.0.1",
+    "material-ui": "^0.16.7",
     "passport": "^0.3.2",
     "passport-linkedin-oauth2": "^1.4.1",
     "react": "^15.4.2",
+    "react-addons-transition-group": "^15.4.2",
     "react-addons-update": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-modal": "^1.6.5",

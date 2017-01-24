@@ -10,8 +10,8 @@ const crud = {
   update: {
     url: 'cc',
     type: 'POST',
-    refernceFlag: 'title',
-    id: 'month1', // default '';
+    refernceFlag: '>month1>arrayIndex>day',
+    id: 'day', // default '';
   },
   delete: {
     url: 'dd',

@@ -10,6 +10,9 @@
   overflow: scroll;
   -webkit-font-smoothing: antialiased;
   font-size: 14px;
+  *{
+    box-sizing: border-box;
+  }
   .string-child{
     margin: 6px 0px 6px 36px;
     .string-value{
@@ -54,6 +57,30 @@
     .array-block, .object-block {
       &:before{
         opacity: 0.3;
+      }
+    }
+  }
+  .settingMenu{
+    height: 100%;
+    width: 300px;
+    background: #000;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    ul{
+      width: 100%;
+      // position: relative;
+      padding: 24px;
+      li{
+        // width: 100%;
+        // position: relative;
+        .refernceFlagInput{
+          width: 100%;
+          position: relative;
+          height: 30px;
+          color: #333;
+          font-size: 14px;
+        }
       }
     }
   }

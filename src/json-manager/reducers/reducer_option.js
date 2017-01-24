@@ -27,6 +27,7 @@ const option = {
     },
   },
   addMethod: 'liberty', // inherit
+  updateFlags: [],
 };
 
 export default function (state = option, action) {
