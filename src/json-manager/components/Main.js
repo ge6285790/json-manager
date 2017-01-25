@@ -195,12 +195,28 @@ class Main extends Component {
       // });
   }
 
-  jsonDataUPDATE(refernceFlag) {
-    const { actions, crud } = this.props;
-    console.log('refernceFlag', refernceFlag);
+  jsonDataUPDATE(text, refernceFlag) {
+    const parseText = text.replace(/"/g, '');
+    const { actions } = this.props;
     const refernceFlagArray = refernceFlag.split('>');
     refernceFlagArray.shift();
-    actions.jsonDataAction.jsonDataUPDATE('aaa', refernceFlagArray);
+
+    const newState = Object.assign(this.state.data, {});
+
+    function updateObject(object, newValue, flag) {
+      while (flag.length > 1) {
+        let index = flag.shift();
+        index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
+        object = object[index];
+      }
+      let index = flag.shift();
+      index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
+      object[index] = newValue;
+    }
+    updateObject(newState, parseText, refernceFlagArray);
+
+
+    actions.jsonDataAction.jsonDataUPDATE(newState);
   }
 
   addNewKey(flags, value) {
