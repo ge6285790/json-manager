@@ -1,10 +1,11 @@
 import React from 'react';
 import { render } from 'react-dom';
+import { Provider } from 'react-redux';
 import Main from './components/Main';
 import css from './css/json-manager.scss';
 
 import store from './store/store';
-import { Provider } from 'react-redux';
+
 
 function Jmgr(option, crud, elementId) {
   this.data = {

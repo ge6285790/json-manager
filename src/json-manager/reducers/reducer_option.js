@@ -53,6 +53,7 @@ export default function (state = option, action) {
             continue;
           }
           if (!isNaN(parseInt(i, 10))) {
+            flag = []
             flag[i] = {};
             continue;
           }
