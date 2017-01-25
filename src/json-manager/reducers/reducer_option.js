@@ -27,7 +27,10 @@ const option = {
     },
   },
   addMethod: 'liberty', // inherit
-  updateFlags: [],
+  // updateFlags: [],
+  updateScope: {
+    flags: [],
+  },
 };
 
 export default function (state = option, action) {
@@ -35,8 +38,30 @@ export default function (state = option, action) {
     case types.JSON_DATA_GET:
       console.log('action', action);
       return update(state, {
-        defaultData: { $set:  action.data  }
+        defaultData: { $set: action.data }
       });
+      case types.JSON_DATA_UPDATE:
+        console.log('action', action);
+        // return update(state, {
+        //   defaultData: { $set:  action.data  }
+        // });
+        let flag = {};
+        const last = action.flag[action.flag.length - 1];
+        for (let i of action.flag) {
+          if (i === last){
+            flag[i] = '';
+            continue;
+          }
+          if (!isNaN(parseInt(i, 10))) {
+            flag[i] = {};
+            continue;
+          }
+          console.log(i);
+          flag = flag[i];
+        }
+        // action.flags.map((item, i) => {
+        //
+        // });
     default:
       return state;
   }

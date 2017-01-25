@@ -17,8 +17,17 @@
     left: 2px;
     // opacity: 0.6;
   }
+  >span {
+    cursor: pointer;
+    transition: background 0.15s ease;
+    &:hover{
+      background-color: rgba(0,0,0,.5);
+    }
+  }
   span{
+    padding: 0px 6px;
     display: inline-block;
+    margin: 0px 0 0 -6px;
   }
   > div {
     margin-left: 18px;

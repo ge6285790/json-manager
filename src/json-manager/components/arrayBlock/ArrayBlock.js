@@ -10,10 +10,10 @@ class ArrayBlock extends Component {
     let keyTitle = this.props.keyTitle;
     keyTitle = `"${keyTitle}": [`;
     const { blockType, refernceFlag } = this.props;
-    const { renderChild } = this.props.methods;
+    const { renderChild, jsonDataUPDATE } = this.props.methods;
     return (
       <div className="array-block">
-        <span>{keyTitle}</span>
+        <span onClick={() => { jsonDataUPDATE(refernceFlag); }}>{keyTitle}</span>
           {renderChild(this.props.data, blockType, refernceFlag)}
         <span className="array-tail">{']'}</span>
       </div>

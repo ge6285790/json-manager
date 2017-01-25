@@ -8,19 +8,23 @@ class StringBlock extends Component {
 
   render() {
     // const { renderChild } = this.props.methods;
-    const { classNameString, value, methods, refernceFlag } = this.props;
+    const { classNameString, value, methods, refernceFlag, keyTitle } = this.props;
+    const { jsonDataUPDATE } = methods;
     return (
-      <span
-        id="sim-input"
-        className={classNameString}
-        contentEditable="true"
-        onInput={(e) => { console.log(e.target.innerText); }}
-        onBlur={(e) => {
-          console.log('aaa', e.target);
-          methods.jsonDataUPDATE(e.target.innerText, refernceFlag);
-        }}
-      >
-        {value}
+      <span className="string-block">
+        <span onClick={() => { jsonDataUPDATE(refernceFlag); }}>{keyTitle}</span>
+        <span
+          id="sim-input"
+          className={classNameString}
+          contentEditable="true"
+          onInput={(e) => { console.log(e.target.innerText); }}
+          onBlur={(e) => {
+            console.log('aaa', e.target);
+            methods.jsonDataUPDATE(e.target.innerText, refernceFlag);
+          }}
+        >
+          {value}
+        </span>
       </span>
     );
   }

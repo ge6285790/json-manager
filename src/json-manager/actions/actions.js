@@ -15,6 +15,10 @@ export function jsonDataGET(data) {
   };
 }
 
-// export function jsonDataUPDATE(data) {
-//
-// }
+export function jsonDataUPDATE(data, flag) {
+  return {
+    type: types.JSON_DATA_UPDATE,
+    data,
+    flag,
+  };
+}

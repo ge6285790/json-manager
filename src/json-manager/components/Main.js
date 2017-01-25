@@ -19,8 +19,11 @@ console.error = (() => {
 })();
 
 function mapStateToProps(state) {
+  console.log('state', state, state.option.updateScope.flags);
   return {
-    updateFlags: state.updateFlags,
+    updateScope: {
+      flags: state.option.updateScope.flags,
+    },
     option: state.option,
     crud: state.crud,
   };
@@ -39,10 +42,11 @@ class Main extends Component {
     // console.log(props);
     this.renderChild = this.renderChild.bind(this);
     this.jsonDataUPDATE = this.jsonDataUPDATE.bind(this);
-    const { option, crud, updateFlags } = props;
-    console.log(option.updateFlags)
+    const { option, crud } = props;
     this.state = {
-      updateFlags: option.updateFlags,
+      updateScope: {
+        flags: option.updateScope.flags,
+      },
       data: option.defaultData || {},
       crud,
     };
@@ -53,9 +57,11 @@ class Main extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { option, crud, updateFlags } = nextProps;
+    const { option, crud } = nextProps;
     this.state = {
-      updateFlags: option.updateFlags,
+      updateScope: {
+        flags: option.updateScope.flags,
+      },
       data: option.defaultData || {},
       crud,
     };
@@ -63,7 +69,7 @@ class Main extends Component {
 
   jsonDataGET() {
     const { actions, crud } = this.props;
-    const { url, type, data, refernceFlag } = crud.read;
+    const { url, refernceFlag } = crud.read;
     request.get(url)
       .set('Accept', 'application/json')
       .end((err, res) => {
@@ -103,18 +109,15 @@ class Main extends Component {
     //   });
   }
 
-  jsonDataUPDATE(value, flags) {
-
+  jsonDataUPDATE1(value, flags) {
     // url: 'cc',
     // type: 'POST',
     // refernceFlag: 'title',
     // id: 'month1', // default '';
-    const { actions, crud } = this.props;
-    const { url, type, id, refernceFlag } = crud.update;
-    console.log(`value: ${value}, flags: ${flags}, refernceFlag: ${refernceFlag}`);
+    const { crud } = this.props;
+    const { refernceFlag } = crud.update;
     const flagArray = flags.split('>');
     const refernceFlagArray = refernceFlag.split('>');
-    console.log(flagArray, refernceFlagArray);
     const updateFlagArray = refernceFlagArray.map((item, i) => {
       // if (item === 'arrayIndex') {
       //   return flagArray[i]
@@ -122,7 +125,7 @@ class Main extends Component {
       // if (item === flagArray[i] || (item === 'arrayIndex' && parseInt(flagArray[i]) !== NaN)) {
       //   return flagArray[i];
       // }
-      if (item === 'arrayIndex' && parseInt(flagArray[i]) !== NaN) {
+      if (item === 'arrayIndex' && !isNaN(parseInt(flagArray[i], 10))) {
         return flagArray[i];
       }
       return item;
@@ -192,6 +195,13 @@ class Main extends Component {
       // });
   }
 
+  jsonDataUPDATE(refernceFlag) {
+    const { actions, crud } = this.props;
+    console.log('refernceFlag', refernceFlag);
+    const refernceFlagArray = refernceFlag.split('>');
+    refernceFlagArray.shift();
+    actions.jsonDataAction.jsonDataUPDATE('aaa', refernceFlagArray);
+  }
 
   addNewKey(flags, value) {
     // let flag = { data };
@@ -228,7 +238,10 @@ class Main extends Component {
                 data={key}
                 keyTitle={keyTitle}
                 blockType={'object'}
-                methods={{ renderChild: this.renderChild }}
+                methods={{
+                  renderChild: this.renderChild,
+                  jsonDataUPDATE: this.jsonDataUPDATE,
+                }}
               />
             </div>
           );
@@ -242,42 +255,49 @@ class Main extends Component {
                 data={key}
                 keyTitle={keyTitle}
                 blockType={'array'}
-                methods={{ renderChild: this.renderChild }}
+                methods={{
+                  renderChild: this.renderChild,
+                  jsonDataUPDATE: this.jsonDataUPDATE,
+                }}
               />
             </div>
           );
 
-        default:
+        default: {
           const value = typeof key === 'number' ? key : `"${key}"`;
           const valueClass = typeof key === 'number' ? 'value' : '';
           const title = isArray ? '' : `"${item}": `;
           const stringClass = title === '' ? '' : 'padding-left';
           return (
             <div className="string-child" key={key + i}>
-              <span>{title}</span>
               <StringBlock
                 refernceFlag={flag}
                 classNameString={`string-value ${stringClass} ${valueClass}`}
                 value={value}
-                methods={{ jsonDataUPDATE: this.jsonDataUPDATE }}
+                keyTitle={title}
+                methods={{
+                  jsonDataUPDATE: this.jsonDataUPDATE,
+                  // jsonDataUPDATE: this.jsonDataUPDATE,
+                }}
               />
               ,
             </div>
           );
+        }
       }
     });
     return array;
   }
 
   render() {
-    const { data, updateFlags } = this.state;
+    const { data, updateScope } = this.state;
     const blockType = Array.isArray(data) ? 'array' : 'default';
-    console.log('updateFlags', updateFlags, this.state);
+    console.log('updateFlags', updateScope.flags, this.state);
     let refernceFlagInputValue = '';
-    if (updateFlags.length !== 0) {
-      refernceFlagInputValue = updateFlags.reduce((prev, next) => `${prev}, ${next}`);
+    if (updateScope.flags.length !== 0) {
+      refernceFlagInputValue = updateScope.flags.reduce((prev, next) => `${prev}, ${next}`);
     }
-    console.log('refernceFlagInputValue',refernceFlagInputValue)
+    console.log('refernceFlagInputValue', refernceFlagInputValue)
     return (
       <div className="json-manager" data-theme="dark">
         <ObjectBlock
@@ -285,17 +305,27 @@ class Main extends Component {
           methods={{ renderChild: this.renderChild }}
           blockType={blockType}
         />
-      <div className="settingMenu">
-        <ul>
-          <li></li>
-          <li>
-            <input className="refernceFlagInput" placeholder="Choice the key..." value={refernceFlagInputValue} />
-          </li>
-        </ul>
-      </div>
+        <div className="settingMenu">
+          <ul>
+            <li></li>
+            <li>
+              <input
+                className="refernceFlagInput"
+                placeholder="Choice the key..."
+                value={refernceFlagInputValue}
+              />
+            </li>
+          </ul>
+        </div>
       </div>
     );
   }
 }
+
+Main.propTypes = {
+  option: React.PropTypes.object.isRequired,
+  crud: React.PropTypes.object.isRequired,
+  actions: React.PropTypes.object.isRequired,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Main);
