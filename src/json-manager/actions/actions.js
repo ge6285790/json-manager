@@ -21,3 +21,24 @@ export function jsonDataUPDATE(data) {
     data,
   };
 }
+
+export function dataPrepare(data) {
+  return {
+    type: types.SCOPE_FLAGS_UPDATE,
+    data,
+  };
+}
+
+export function dataFlagRemove(data) {
+  return {
+    type: types.SCOPE_FLAGS_REMOVE,
+    data,
+  };
+}
+
+export function sendTypeUpdate(data) {
+  return {
+    type: types.SCOPE_SEND_TYPE_UPDATE,
+    data,
+  };
+}

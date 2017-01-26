@@ -63,7 +63,7 @@
   }
   .settingMenu{
     height: 100%;
-    width: 300px;
+    width: 360px;
     background: #000;
     position: fixed;
     right: 0px;
@@ -78,9 +78,75 @@
         .refernceFlagInput{
           width: 100%;
           position: relative;
-          height: 30px;
+          height: 60px;
           color: #333;
           font-size: 14px;
+          background: #fff;
+          padding: 12px;
+          overflow: scroll;
+          .flags{
+            color: #fff;
+            display: inline-block;
+            padding: 3px 6px;
+            background: #333;
+            margin: 3px;
+            border-radius: 3px;
+            cursor: pointer;
+            // margin-right: 23px;
+            transition: 0.3s ease;
+            .close{
+              color: #fff;
+              // margin-left: 6px;
+              // padding-left: 3px;
+              margin-left: 0px;
+              padding-left: 0px;
+              // border-left: 1px solid #fff;
+              border-left: 0px solid #fff;
+              // width: 0px;
+              overflow: hidden;
+              display: inline-block;
+              transition: 0.3s ease;
+              vertical-align: top;
+
+
+              /*-------*/
+              // width: 16px;
+              margin-left: 9px;
+              padding-left: 6px;
+              margin-right: 3px;
+              border-left: 1px solid #fff;
+
+            }
+            /*&:hover{
+              margin-right: 0px;
+              .close{
+                width: 16px;
+                margin-left: 6px;
+                padding-left: 3px;
+                border-left: 1px solid #fff;
+              }
+            }*/
+          }
+        }
+        .textarea {
+          width: 100%;
+          height: 300px;
+          background: #fff;
+          color: #000;
+          resize: none;
+          border: 0px;
+          padding: 12px;
+          margin-top: 24px;
+          overflow: scroll;
+        }
+        .typeRadio{
+          color: #fff;
+          margin: 12px 0px;
+          display: inline-block;
+          margin-right: 12px;
+          input{
+            margin-right: 6px;
+          }
         }
       }
     }

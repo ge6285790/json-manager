@@ -21,9 +21,7 @@ console.error = (() => {
 function mapStateToProps(state) {
   console.log('state', state, state.option.updateScope.flags);
   return {
-    updateScope: {
-      flags: state.option.updateScope.flags,
-    },
+    updateScope: state.updateScope,
     option: state.option,
     crud: state.crud,
   };
@@ -42,11 +40,10 @@ class Main extends Component {
     // console.log(props);
     this.renderChild = this.renderChild.bind(this);
     this.jsonDataUPDATE = this.jsonDataUPDATE.bind(this);
-    const { option, crud } = props;
+    this.dataPrepare = this.dataPrepare.bind(this);
+    const { option, crud, updateScope } = props;
     this.state = {
-      updateScope: {
-        flags: option.updateScope.flags,
-      },
+      updateScope,
       data: option.defaultData || {},
       crud,
     };
@@ -57,11 +54,9 @@ class Main extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { option, crud } = nextProps;
+    const { option, crud, updateScope } = nextProps;
     this.state = {
-      updateScope: {
-        flags: option.updateScope.flags,
-      },
+      updateScope,
       data: option.defaultData || {},
       crud,
     };
@@ -219,6 +214,25 @@ class Main extends Component {
     actions.jsonDataAction.jsonDataUPDATE(newState);
   }
 
+  dataPrepare(flag) {
+    const { actions } = this.props;
+    if (this.state.updateScope.flags.indexOf(flag) > -1) {
+      return;
+    }
+    console.log('--flag', flag);
+    actions.jsonDataAction.dataPrepare(flag);
+  }
+
+  dataFlagRemove(index) {
+    const { actions } = this.props;
+    actions.jsonDataAction.dataFlagRemove(index);
+  }
+
+  sendTypeUpdate(type) {
+    const { actions } = this.props;
+    actions.jsonDataAction.sendTypeUpdate(type);
+  }
+
   addNewKey(flags, value) {
     // let flag = { data };
     // for (let key in flags) {
@@ -256,7 +270,7 @@ class Main extends Component {
                 blockType={'object'}
                 methods={{
                   renderChild: this.renderChild,
-                  jsonDataUPDATE: this.jsonDataUPDATE,
+                  dataPrepare: this.dataPrepare,
                 }}
               />
             </div>
@@ -273,7 +287,7 @@ class Main extends Component {
                 blockType={'array'}
                 methods={{
                   renderChild: this.renderChild,
-                  jsonDataUPDATE: this.jsonDataUPDATE,
+                  dataPrepare: this.dataPrepare,
                 }}
               />
             </div>
@@ -293,7 +307,7 @@ class Main extends Component {
                 keyTitle={title}
                 methods={{
                   jsonDataUPDATE: this.jsonDataUPDATE,
-                  // jsonDataUPDATE: this.jsonDataUPDATE,
+                  dataPrepare: this.dataPrepare,
                 }}
               />
               ,
@@ -305,15 +319,78 @@ class Main extends Component {
     return array;
   }
 
-  render() {
-    const { data, updateScope } = this.state;
-    const blockType = Array.isArray(data) ? 'array' : 'default';
-    console.log('updateFlags', updateScope.flags, this.state);
-    let refernceFlagInputValue = '';
-    if (updateScope.flags.length !== 0) {
-      refernceFlagInputValue = updateScope.flags.reduce((prev, next) => `${prev}, ${next}`);
+  renderRefernceFlagInputValue() {
+    const { updateScope } = this.state;
+    if (updateScope.flags.length === 0) {
+      return (
+        <span className="flags" key={'Choice the key...'}>Choice the key...</span>
+      );
     }
-    console.log('refernceFlagInputValue', refernceFlagInputValue)
+    return updateScope.flags.map((item, i) => {
+      return (
+        <span
+          className="flags"
+          key={item + i}
+          onClick={() => { this.dataFlagRemove(i, item); }}
+        >
+          {item}
+          <span className="close">×</span>
+        </span>
+      );
+    });
+  }
+
+  renderDataTextarea() {
+    const { updateScope, data } = this.state;
+    const type = updateScope.sendType;
+    if(updateScope.flags.length === 0){
+      return '';
+    }
+    let flagArray = updateScope.flags.map((item, i) => {
+      const array = item.split('>');
+      let jsonData = data;
+      array.shift();
+      for (let i of array) {
+        jsonData = jsonData[i];
+      }
+      if (type === 'Object') {
+        return `"${array.pop()}":${JSON.stringify(jsonData)}`;
+      }
+      return JSON.stringify(jsonData);
+    });
+    flagArray = flagArray.reduce((prev, next) => {
+      return [prev, <span key={new Date() + Math.random()}><br /><br /></span>, next];
+    });
+    // flagArray = [flagArray];
+    console.log('flagArray', flagArray)
+    if (type === 'Object') {
+      flagArray = Array.isArray[flagArray] ? flagArray : [flagArray];
+      flagArray.unshift(<br />);
+      flagArray.unshift(<br />);
+      flagArray.unshift('{');
+      flagArray.push(<br />);
+      flagArray.push(<br />);
+      flagArray.push('}');
+    }
+    if (type === 'Array') {
+      flagArray = Array.isArray[flagArray] ? flagArray : [flagArray];
+      flagArray.unshift(<br />);
+      flagArray.unshift(<br />);
+      flagArray.unshift('[');
+      flagArray.push(<br />);
+      flagArray.push(<br />);
+      flagArray.push(']');
+    }
+    return flagArray;
+  }
+
+  render() {
+    const { data } = this.state;
+    const blockType = Array.isArray(data) ? 'array' : 'default';
+    // let refernceFlagInputValue = '';
+    // if (updateScope.flags.length !== 0) {
+    //   refernceFlagInputValue = updateScope.flags.reduce((prev, next) => `${prev}, ${next}`);
+    // }
     return (
       <div className="json-manager" data-theme="dark">
         <ObjectBlock
@@ -325,11 +402,34 @@ class Main extends Component {
           <ul>
             <li></li>
             <li>
-              <input
+              {/* <input
                 className="refernceFlagInput"
                 placeholder="Choice the key..."
                 value={refernceFlagInputValue}
-              />
+              /> */}
+              <div className="refernceFlagInput">
+                {this.renderRefernceFlagInputValue()}
+              </div>
+            </li>
+            <li>
+              {/* <textarea value={this.renderDataTextarea()} /> */}
+              <div className="textarea">
+                {this.renderDataTextarea()}
+              </div>
+            </li>
+            <li>
+              <span className="typeRadio">
+                <input type="radio" name="type" onChange={() => { this.sendTypeUpdate('Default'); }} defaultChecked />
+                Default
+              </span>
+              <span className="typeRadio">
+                <input type="radio" name="type" onChange={() => { this.sendTypeUpdate('Array'); }} />
+                Array
+              </span>
+              <span className="typeRadio">
+                <input type="radio" name="type" onChange={() => { this.sendTypeUpdate('Object'); }} />
+                Object
+              </span>
             </li>
           </ul>
         </div>
