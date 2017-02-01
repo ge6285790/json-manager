@@ -8,30 +8,73 @@
 // }
 import * as types from '../constants/actionTypes';
 
-export function jsonDataGET(data) {
+export function modeTypeUpdate(data) {
   return {
-    type: types.JSON_DATA_GET,
+    type: types.MODE_TYPE_UPDATE,
+    data,
+  };
+}
+
+export function apiGET(data) {
+  return {
+    type: types.API_GET,
     data,
   };
 }
 
 export function jsonDataUPDATE(data) {
+  console.log('jsonDataUPDATE(data)', data);
   return {
     type: types.JSON_DATA_UPDATE,
     data,
   };
 }
 
-export function dataPrepare(data) {
+export function jsonDataTempAdd(data) {
   return {
-    type: types.SCOPE_FLAGS_UPDATE,
+    type: types.JSON_DATA_TEMP_ADD,
     data,
   };
 }
 
-export function dataFlagRemove(data) {
+export function jsonDataTempRemove(data) {
   return {
-    type: types.SCOPE_FLAGS_REMOVE,
+    type: types.JSON_DATA_TEMP_REMOVE,
+    data,
+  };
+}
+
+export function jsonDataEditTempAdd(data) {
+  return {
+    type: types.JSON_DATA_EDIT_TEMP_ADD,
+    data,
+  };
+}
+
+export function jsonDataEditTempRemove(data) {
+  return {
+    type: types.JSON_DATA_EDIT_TEMP_REMOVE,
+    data,
+  };
+}
+
+export function crudUrlUpdate(data) {
+  return {
+    type: types.CRUD_URL_UPDATE,
+    data,
+  };
+}
+
+export function crudTypeUpdate(data) {
+  return {
+    type: types.CRUD_TYPE_UPDATE,
+    data,
+  };
+}
+
+export function sendApiTabSwitch(data) {
+  return {
+    type: types.SCOPE_SEND_API_TYPE,
     data,
   };
 }

@@ -1,6 +1,13 @@
+import * as types from '../constants/actionTypes';
+import update from 'react-addons-update';
+
 const crud = {
   // if don't, just let it empty, default is false
-  create: 'aa',
+  create: {
+    url: 'https://store.readmoo.com/api/reading17/get',
+    // url: 'https://www.youtube.com/feed_ajax?action_get_unseen_notification_count=1',
+    type: 'POST',
+  },
   read: {
     url: 'https://store.readmoo.com/api/reading17/get',
     // url: 'https://www.youtube.com/feed_ajax?action_get_unseen_notification_count=1',
@@ -10,8 +17,8 @@ const crud = {
   },
   update: {
     url: 'cc',
-    type: 'POST',
-    refernceFlag: '>month1>arrayIndex>day',
+    type: 'GET',
+    // refernceFlag: '>month1>arrayIndex>day',
     id: 'day', // default '';
   },
   delete: {
@@ -22,6 +29,18 @@ const crud = {
 
 export default function (state = crud, action) {
   switch (action.type) {
+    case types.CRUD_URL_UPDATE:
+      return update(state, {
+        [action.data.type]: {
+          url: { $set: action.data.url },
+        },
+      });
+    case types.CRUD_TYPE_UPDATE:
+      return update(state, {
+        [action.data.type]: {
+          type: { $set: action.data.crudType },
+        },
+      });
     default:
       return state;
   }

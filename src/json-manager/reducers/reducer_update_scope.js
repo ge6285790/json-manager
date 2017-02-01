@@ -3,7 +3,10 @@ import update from 'react-addons-update';
 
 const initialize = {
   flags: [],
-  dataTextarea: [],
+  dataTextarea: '',
+  sendApi: {
+    type: 'update',
+  },
   sendType: 'default',
   // sendType: 'Object',
   // sendType: 'Array',
@@ -19,11 +22,11 @@ export default function (state = initialize, action) {
     //   return update(state, {
     //     defaultData: { $set: action.data },
     //   });
-    case types.SCOPE_FLAGS_UPDATE:
+    case types.JSON_DATA_TEMP_ADD:
       return update(state, {
         flags: { $push: [action.data] },
       });
-    case types.SCOPE_FLAGS_REMOVE:
+    case types.JSON_DATA_TEMP_REMOVE:
       // return update(state, {
       //   flags: { $splice: [[action.data, action.data + 1]] },
       // });
@@ -31,9 +34,14 @@ export default function (state = initialize, action) {
         flags: { $set: state.flags.filter((_, i) => i !== action.data) },
       });
     case types.SCOPE_SEND_TYPE_UPDATE:
-      console.log(action.data);
       return update(state, {
         sendType: { $set: action.data },
+      });
+    case types.SCOPE_SEND_API_TYPE:
+      return update(state, {
+        sendApi: {
+          type: { $set: action.data },
+        },
       });
     default:
       return state;

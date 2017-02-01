@@ -6,6 +6,9 @@
   line-height: 1.6em;
   // padding: 6px 0px;
   position: relative;
+  &.__edited_record{
+    opacity: 0.5;
+  }
   &:before{
     content: '';
     position: absolute;
@@ -16,6 +19,14 @@
     border-left: 1px dotted #ABB2BF;
     left: 2px;
     // opacity: 0.6;
+  }
+  &[data-mode="edit"]{
+    >span {
+      &:hover{
+        background-color: rgba(0,0,0,0);
+        color: #317FBF;
+      }
+    }
   }
   >span {
     cursor: pointer;

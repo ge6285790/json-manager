@@ -28,20 +28,33 @@ const option = {
   },
   addMethod: 'liberty', // inherit
   // updateFlags: [],
-  updateScope: {
-    flags: [],
+  editScope: {
+    flags: '',
+    goback: [],
   },
 };
 
 export default function (state = option, action) {
   switch (action.type) {
-    case types.JSON_DATA_GET:
+    case types.API_GET:
       return update(state, {
         defaultData: { $set: action.data },
       });
     case types.JSON_DATA_UPDATE:
       return update(state, {
         defaultData: { $set: action.data },
+      });
+    case types.JSON_DATA_EDIT_TEMP_ADD:
+      return update(state, {
+        editScope: {
+          flags: { $set: action.data },
+        },
+      });
+    case types.JSON_DATA_EDIT_TEMP_REMOVE:
+      return update(state, {
+        editScope: {
+          flags: { $set: '' },
+        },
       });
     default:
       return state;

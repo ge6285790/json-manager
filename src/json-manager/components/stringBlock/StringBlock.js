@@ -31,16 +31,40 @@ import css from './stringBlock.scss';
 // }
 
 const StringBlock = (props) => {
-  const { classNameString, value, methods, refernceFlag, keyTitle } = props;
-  const { dataPrepare } = methods;
+  const { classNameString, value, methods, refernceFlag, keyTitle, modeType } = props;
+  const { jsonDataTempAdd, jsonDataEditTempAdd } = methods;
+  if (modeType === 'send') {
+    return (
+      <span className="string-block">
+        <span onClick={() => { jsonDataTempAdd(refernceFlag); }}>{keyTitle}</span>
+        <span
+          id="sim-input"
+          className={classNameString}
+          contentEditable="true"
+          // onInput={(e) => { console.log(e.target.innerText); }}
+          onFocus={(e) => {
+            console.log('in');
+          }}
+          onBlur={(e) => {
+            methods.jsonDataUPDATE(e.target.innerText, refernceFlag);
+          }}
+        >
+          {value}
+        </span>
+      </span>
+    );
+  }
   return (
     <span className="string-block">
-      <span onClick={() => { dataPrepare(refernceFlag); }}>{keyTitle}</span>
+      <span data-mode="edit" onClick={() => { jsonDataEditTempAdd(refernceFlag); }}>{keyTitle}</span>
       <span
         id="sim-input"
         className={classNameString}
         contentEditable="true"
         // onInput={(e) => { console.log(e.target.innerText); }}
+        onFocus={(e) => {
+          console.log('in');
+        }}
         onBlur={(e) => {
           methods.jsonDataUPDATE(e.target.innerText, refernceFlag);
         }}

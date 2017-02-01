@@ -24,12 +24,22 @@ import css from './objectBlock.scss';
 const ObjectBlock = (props) => {
   let keyTitle = props.keyTitle || '';
   keyTitle = keyTitle === '' ? '{' : `"${keyTitle}": {`;
-  const { blockType, refernceFlag, methods } = props;
-  const { renderChild, dataPrepare } = methods;
+  const { blockType, refernceFlag, methods, modeType } = props;
+  const { renderChild, jsonDataTempAdd, jsonDataEditTempAdd } = methods;
+  const edited = props.keyTitle === '__edited_record' ? '__edited_record' : '';
+  if (modeType === 'send') {
+    return (
+      <div className="object-block">
+        <span onClick={() => { jsonDataTempAdd(refernceFlag); }}>{keyTitle}</span>
+        {renderChild(props.data, blockType, refernceFlag, modeType)}
+        <span className="object-tail">{'}'}</span>
+      </div>
+    );
+  }
   return (
-    <div className="object-block">
-      <span onClick={() => { dataPrepare(refernceFlag); }}>{keyTitle}</span>
-      {renderChild(props.data, blockType, refernceFlag)}
+    <div className={`object-block ${edited}`} data-mode="edit">
+      <span onClick={() => { jsonDataEditTempAdd(refernceFlag); }}>{keyTitle}</span>
+      {renderChild(props.data, blockType, refernceFlag, modeType)}
       <span className="object-tail">{'}'}</span>
     </div>
   );
