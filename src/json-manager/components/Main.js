@@ -41,6 +41,37 @@ function updateObject(object, newValue, flag) {
     return;
   }
   object[index] = newValue;
+  console.log('object type', object)
+
+
+  //--------
+  if (Array.isArray(object)) {
+    let newEditedRecord = object.filter(item => {
+      if (item[0] === '__edited_record') {
+        return true;
+      }
+    });
+    if (newEditedRecord.length === 0) {
+      newEditedRecord = ['__edited_record']
+    } else {
+      newEditedRecord = newEditedRecord[0];
+      const indexNumber = object.indexOf(newEditedRecord);
+      object.splice(indexNumber, 1);
+    }
+    // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
+
+    newEditedRecord.push({
+      key: index,
+      type: `[Object Value Update]: '${JSON.stringify(oldValue)}' convert to '${JSON.stringify(newValue)}'`,
+    });
+
+    object.push(newEditedRecord);
+    return;
+  }
+
+  //-----------
+
+
   let newEditedRecord = object['__edited_record'] || [];
   newEditedRecord = [...newEditedRecord];
   newEditedRecord.push({
@@ -97,10 +128,83 @@ function addObject(object, newValue, flag) {
   console.log('newValue', newValue);
   if (typeof newValue === 'object' && !Array.isArray(newValue)) {
     console.log(1);
-    object[index][newKey] = {...newValue};
+    if (!Array.isArray(object[index])) {
+      object[index][newKey] = {...newValue};
+
+      let newEditedRecord = object[index]['__edited_record'] || [];
+      newEditedRecord = [...newEditedRecord];
+      newEditedRecord.push({
+        key: newKey,
+        type: `[Object Value Update]: create new value`,
+      });
+      delete object[index]['__edited_record'];
+      // console.log('oldValue and newValue', oldValue, newValue);
+      // try{
+      object[index]['__edited_record'] = newEditedRecord;
+    } else {
+      object[index].push({...newValue});
+
+      let newEditedRecord = object[index].filter(item => {
+        if (item[0] === '__edited_record') {
+          return true;
+        }
+      });
+      if (newEditedRecord.length === 0) {
+        newEditedRecord = ['__edited_record']
+      } else {
+        newEditedRecord = newEditedRecord[0];
+        const indexNumber = object.indexOf(newEditedRecord);
+        object[index].splice(indexNumber, 1);
+      }
+      // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
+
+      newEditedRecord.push({
+        key: newKey,
+        type: `[Object Value Update]: create new value`,
+      });
+
+      object[index].push(newEditedRecord);
+      return;
+    }
   } else {
     console.log(1);
-    object[index][newKey] = newValue;
+    // object[index][newKey] = newValue;
+    if (!Array.isArray(object[index])) {
+      object[index][newKey] = newValue;
+      let newEditedRecord = object[index]['__edited_record'] || [];
+      newEditedRecord = [...newEditedRecord];
+      newEditedRecord.push({
+        key: newKey,
+        type: `[Object Value Update]: create new value`,
+      });
+      delete object[index]['__edited_record'];
+      // console.log('oldValue and newValue', oldValue, newValue);
+      // try{
+      object[index]['__edited_record'] = newEditedRecord;
+    } else {
+      object[index].push(newValue);
+      let newEditedRecord = object[index].filter(item => {
+        if (item[0] === '__edited_record') {
+          return true;
+        }
+      });
+      if (newEditedRecord.length === 0) {
+        newEditedRecord = ['__edited_record']
+      } else {
+        newEditedRecord = newEditedRecord[0];
+        const indexNumber = object[index].indexOf(newEditedRecord);
+        object[index].splice(indexNumber, 1);
+      }
+      // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
+
+      newEditedRecord.push({
+        key: newKey,
+        type: `[Object Value Update]: create new value`,
+      });
+
+      object[index].push(newEditedRecord);
+      return;
+    }
   }
   console.log('object[index]', object[index]);
   // object[index]['__edited_record'] = object[index]['__edited_record'] || [];
@@ -116,16 +220,17 @@ function addObject(object, newValue, flag) {
   // //   //   type: `[Object Value Update]: create '${newValue}' and clone '${flag}' to it`,
   // //   // });
   // // }
-  let newEditedRecord = object[index]['__edited_record'] || [];
-  newEditedRecord = [...newEditedRecord];
-  newEditedRecord.push({
-    key: newKey,
-    type: `[Object Value Update]: create new value`,
-  });
-  delete object[index]['__edited_record'];
-  // console.log('oldValue and newValue', oldValue, newValue);
-  // try{
-  object[index]['__edited_record'] = newEditedRecord;
+
+  // let newEditedRecord = object[index]['__edited_record'] || [];
+  // newEditedRecord = [...newEditedRecord];
+  // newEditedRecord.push({
+  //   key: newKey,
+  //   type: `[Object Value Update]: create new value`,
+  // });
+  // delete object[index]['__edited_record'];
+  // // console.log('oldValue and newValue', oldValue, newValue);
+  // // try{
+  // object[index]['__edited_record'] = newEditedRecord;
 }
 
 function adjustValueObject(object, flag, item, type) {
