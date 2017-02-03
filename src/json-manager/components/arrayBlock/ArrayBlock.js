@@ -10,7 +10,7 @@ const ArrayBlock = (props) => {
   const edited = props.keyTitle === '__edited_record' ? '__edited_record' : false;
   if (modeType === 'send') {
     return (
-      <div className="array-block">
+      <div className={`array-block ${editedRecord || edited}`}>
         <span
           onClick={() => {
             jsonDataTempAdd(refernceFlag);

@@ -29,7 +29,7 @@ const ObjectBlock = (props) => {
   const edited = props.keyTitle === '__edited_record' ? '__edited_record' : '';
   if (modeType === 'send') {
     return (
-      <div className="object-block">
+      <div className={`object-block ${edited}`}>
         <span onClick={() => { jsonDataTempAdd(refernceFlag); }}>{keyTitle}</span>
         {renderChild(props.data, blockType, refernceFlag, modeType)}
         <span className="object-tail">{'}'}</span>

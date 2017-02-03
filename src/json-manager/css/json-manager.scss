@@ -112,7 +112,13 @@
     right: 0px;
     top: 0px;
 
-    display: none;
+    // display: none;
+    transform: translateX(100%);
+    transition: 0.3s ease;
+    &[data-active="true"]{
+      transform: translateX(0%);
+      transition: 0.3s 0.3s ease;
+    }
 
     ul{
       width: 100%;
@@ -130,6 +136,7 @@
           background: #fff;
           padding: 12px;
           overflow: scroll;
+          white-space: initial;
           .flags{
             color: #fff;
             display: inline-block;
@@ -258,7 +265,7 @@
   }
 
   .setting-menu-edit{
-    display: block;
+
     .textarea-edit{
       color: #333;
       cursor: default;
@@ -321,6 +328,16 @@
         background: #AA3C45;
       }
     }
+    .json-button{
+      padding: 6px 12px;
+      background: #5CB85C;
+      color: #fff;
+      transition: background 0.3s ease;
+      cursor: pointer;
+      &:hover{
+        background: #3C983C;
+      }
+    }
     .clone_reference{
       margin-left: 6px;
     }
@@ -338,4 +355,19 @@
   .float-right{
     float: right;
   }
+}
+.text-center{
+  text-align: center;
+}
+
+.clearfix:before,
+.clearfix:after {
+  content: "";
+  display: table;
+}
+.clearfix:after {
+  clear: both;
+}
+.clearfix {
+  *zoom: 1; /*For IE 6&7 only*/
 }

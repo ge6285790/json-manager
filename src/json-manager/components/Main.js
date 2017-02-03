@@ -127,8 +127,9 @@ function addObject(object, newValue, flag) {
   // console.log("object['newValue']", object[index], object[index]['newValue'], newValue);
   console.log('newValue', newValue);
   if (typeof newValue === 'object' && !Array.isArray(newValue)) {
-    console.log(1);
+    console.log(1, object[index]);
     if (!Array.isArray(object[index])) {
+      console.log(2);
       object[index][newKey] = {...newValue};
 
       let newEditedRecord = object[index]['__edited_record'] || [];
@@ -142,6 +143,7 @@ function addObject(object, newValue, flag) {
       // try{
       object[index]['__edited_record'] = newEditedRecord;
     } else {
+      console.log(3);
       object[index].push({...newValue});
 
       let newEditedRecord = object[index].filter(item => {
@@ -149,11 +151,12 @@ function addObject(object, newValue, flag) {
           return true;
         }
       });
+      console.log('newEditedRecord', newEditedRecord);
       if (newEditedRecord.length === 0) {
         newEditedRecord = ['__edited_record']
       } else {
         newEditedRecord = newEditedRecord[0];
-        const indexNumber = object.indexOf(newEditedRecord);
+        const indexNumber = object[index].indexOf(newEditedRecord);
         object[index].splice(indexNumber, 1);
       }
       // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
@@ -435,6 +438,7 @@ class Main extends Component {
     this.jsonDataTempAdd = this.jsonDataTempAdd.bind(this);
     this.jsonDataEditTempAdd = this.jsonDataEditTempAdd.bind(this);
     this.jsonDataREMOVE = this.jsonDataREMOVE.bind(this);
+    this.addSubValueType = 'String';
     // jsonDataEditTempRemove: this.jsonDataEditTempRemove,
     const { option, crud, updateScope, modeOption } = props;
     this.state = {
@@ -847,6 +851,17 @@ class Main extends Component {
     // }));
   }
 
+  // downloadJSONFile() {
+  //   const { data } = this.state;
+  //   let parseData = {...data};
+  //   let array = Object.keys(parseData);
+  //   for (const item of array) {
+  //     if (parseData[item]) {
+  //
+  //     }
+  //   }
+  // }
+
   renderChild(data, blockType, refernceFlag, modeOptionType) {
     const isArray = Array.isArray(data);
     let array = Object.keys(data);
@@ -970,7 +985,7 @@ class Main extends Component {
     const { updateScope } = this.state;
     if (updateScope.flags.length === 0) {
       return (
-        <span className="flags" key={'Choice the key...'}>Choice the key...</span>
+        <span className="flags" key={'Choice the key...'}>Choice the key / keys...</span>
       );
     }
     return updateScope.flags.map((item, i) => {
@@ -1000,12 +1015,25 @@ class Main extends Component {
     if (updateScope.flags.length === 0) {
       return '';
     }
+
+    console.log('updateScope.flags', updateScope.flags);
     let flagArray = updateScope.flags.map((item, i) => {
       const array = item.split('>');
       let jsonData = data;
       array.shift();
       for (let i of array) {
+        // console.log('send', jsonData[i], jsonData[i]['__edited_record']);
         jsonData = jsonData[i];
+      }
+      console.log('jsonData', jsonData);
+      if (Array.isArray(jsonData) && typeof jsonData === 'object') {
+        jsonData = [...jsonData];
+        console.log('jsonData----', jsonData)
+        jsonData.splice(jsonData.indexOf('__edited_record'), 1);
+      } else if (typeof jsonData === 'object') {
+        jsonData = {...jsonData};
+        console.log('jsonData----1', jsonData)
+        delete jsonData['__edited_record'];
       }
       if (type === 'Object') {
         return `"${array.pop()}":${JSON.stringify(jsonData)}`;
@@ -1085,9 +1113,9 @@ class Main extends Component {
       }
       //   return array   //
       jsonData = jsonData.map((item, i) => {
-        // if (item[0] === '__edited_record') {
-        //   return '';
-        // }
+        if (item[0] === '__edited_record') {
+          return '';
+        }
         const removed = removeEditRecord.indexOf(i) > -1 ? true : false;
         return (
           <span
@@ -1243,7 +1271,7 @@ class Main extends Component {
         />
 
 
-        <div className="setting-menu-edit">
+      <div className="setting-menu-edit" data-active={modeOption.type === 'edit' ? 'true' : 'false' }>
           <ul>
             <li>
               <div className="refernce-flag-input">
@@ -1259,36 +1287,36 @@ class Main extends Component {
               <span className="change_value_type">Change Value Type: </span>
               <br/>
               <span className="type-radio">
-                <input type="radio" name="type" onChange={() => { this.editTypeUpdate('String'); }} defaultChecked />
+                <input type="radio" name="value-type" onChange={() => { this.editTypeUpdate('String'); }} defaultChecked />
                 String
               </span>
               <span className="type-radio">
-                <input type="radio" name="type" onChange={() => { this.editTypeUpdate('Array'); }} />
+                <input type="radio" name="value-type" onChange={() => { this.editTypeUpdate('Array'); }} />
                 Array
               </span>
               <span className="type-radio">
-                <input type="radio" name="type" onChange={() => { this.editTypeUpdate('Object'); }} />
+                <input type="radio" name="value-type" onChange={() => { this.editTypeUpdate('Object'); }} />
                 Object
               </span>
             </li>
-            <li>
+            <li className="clearfix">
               <span className="change_value_type">Add Sub Value: </span>
               <br/>
               <span className="type-radio">
-                <input type="radio" name="type" onChange={() => { this.addSubValueType = 'String'; }} defaultChecked="true" />
+                <input type="radio" name="sub-type" onChange={() => { this.addSubValueType = 'String'; }} defaultChecked="true" />
                 String
               </span>
               <span className="type-radio">
-                <input type="radio" name="type" onChange={() => { this.addSubValueType = 'Array'; }} />
+                <input type="radio" name="sub-type" onChange={() => { this.addSubValueType = 'Array'; }} />
                 Array
               </span>
               <span className="type-radio">
-                <input type="radio" name="type" onChange={() => { this.addSubValueType = 'Object'; }} />
+                <input type="radio" name="sub-type" onChange={() => { this.addSubValueType = 'Object'; }} />
                 Object
               </span>
               <br/>
               <span className="type-radio">
-                <input type="radio" name="type" onChange={() => { this.addSubValueType = 'Clone'; }} />
+                <input type="radio" name="sub-type" onChange={() => { this.addSubValueType = 'Clone'; }} />
                 Clone Other
                 <input className="clone_reference" type="text" name="type" placeholder={`ex. ${editScope.flags || '>month1'}>subkey`} onChange={(e) => { this.cloneSubValueType = e.target.value; }} />
               </span>
@@ -1298,10 +1326,13 @@ class Main extends Component {
               </span>
             </li>
           </ul>
+          <div className="text-center">
+            <span className="json-button" onClick={() => { this.downloadJSONFile(); }}>Download JSON file</span>
+          </div>
         </div>
 
 
-        <div className="setting-menu-send">
+        <div className="setting-menu-send" data-active={modeOption.type === 'send' ? 'true' : 'false' }>
           <ul>
             <li>
               <div className="refernce-flag-input">
@@ -1316,7 +1347,7 @@ class Main extends Component {
             <li>
               <span className="type-radio">
                 <input type="radio" name="type" onChange={() => { this.sendTypeUpdate('Default'); }} defaultChecked />
-                String
+                Default
               </span>
               <span className="type-radio">
                 <input type="radio" name="type" onChange={() => { this.sendTypeUpdate('Array'); }} />
