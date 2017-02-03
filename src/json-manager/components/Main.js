@@ -271,31 +271,87 @@ function adjustValueObject(object, flag, item, type) {
   }
   let index = flag.shift();
   index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
-  object[index]['__edited_record'] = object[index]['__edited_record'] || [];
+  const objectType = Array.isArray(object[index]) ? 'Array' : 'Object';
+  // object[index]['__edited_record'] = object[index]['__edited_record'] || [];
   console.log('adjustValueObject');
   if (type === 'recover remove') {
-    object[index]['__edited_record'] = object[index]['__edited_record'].map(i => {
-      console.log('item', i, item);
-      if (i.key === item) {
-        i.type = 'recover remove';
+    if (objectType === 'Object') {
+      object[index]['__edited_record'] = object[index]['__edited_record'] || [];
+      object[index]['__edited_record'] = object[index]['__edited_record'].map(i => {
+        console.log('item', i, item);
+        if (i.key === item) {
+          i.type = 'recover remove';
+        }
+        return i;
+      });
+    } else{
+      let newEditedRecord = object[index].filter(item => {
+        if (item[0] === '__edited_record') {
+          return true;
+        }
+      });
+      if (newEditedRecord.length === 0) {
+        newEditedRecord = ['__edited_record', {
+          key: item,
+          type: 'recover remove',
+        }];
+      } else {
+        newEditedRecord = newEditedRecord[0];
+        const indexNumber = object[index].indexOf(newEditedRecord);
+        object[index].splice(indexNumber, 1);
       }
-      return i;
-    });
+      // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
+
+      // newEditedRecord.push({
+      //   key: newKey,
+      //   type: `[Object Value Update]: create new value`,
+      // });
+      newEditedRecord.map(child => {
+        if (child.key === item) {
+          child.type = 'recover remove';
+        }
+        return child;
+      })
+
+      object[index].push(newEditedRecord);
+    }
   } else {
     // object[index]['__edited_record'].push({
     //   key: item,
     //   type,
     // });
-    let newEditedRecord = object[index]['__edited_record'] || [];
-    newEditedRecord = [...newEditedRecord];
-    newEditedRecord.push({
-      key: item,
-      type,
-    });
-    delete object[index]['__edited_record'];
-    // console.log('oldValue and newValue', oldValue, newValue);
-    // try{
-    object[index]['__edited_record'] = newEditedRecord;
+    if (objectType === 'Object') {
+      let newEditedRecord = object[index]['__edited_record'] || [];
+      newEditedRecord = [...newEditedRecord];
+      newEditedRecord.push({
+        key: item,
+        type,
+      });
+      delete object[index]['__edited_record'];
+      // console.log('oldValue and newValue', oldValue, newValue);
+      // try{
+      object[index]['__edited_record'] = newEditedRecord;
+    } else {
+      let newEditedRecord = object[index].filter(item => {
+        if (item[0] === '__edited_record') {
+          return true;
+        }
+      });
+      if (newEditedRecord.length === 0) {
+        newEditedRecord = ['__edited_record'];
+      } else {
+        newEditedRecord = newEditedRecord[0];
+        const indexNumber = object[index].indexOf(newEditedRecord);
+        object[index].splice(indexNumber, 1);
+      }
+      // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
+
+      newEditedRecord.push({
+        key: item,
+        type,
+      });
+      object[index].push(newEditedRecord);
+    }
   }
 }
 
@@ -707,7 +763,13 @@ class Main extends Component {
       if (Array.isArray(flagValue)) {
         flagValue.forEach(function(data, i){
           console.log('data', data)
-          newValue[i] = data;
+          if (data[0] === '__edited_record') {
+            data.shift();
+            newValue['__edited_record'] = data;
+          } else {
+            newValue[i] = data;
+          }
+
         });
       } else {
         newValue[0] = flagValue;
@@ -727,7 +789,9 @@ class Main extends Component {
         console.log('flagValue2', flagValue);
         for (const item in flagValue) {
           if (item === '__edited_record') {
-            // newValue.push(flagValue[item]);
+            console.log(flagValue['__edited_record'])
+            flagValue['__edited_record'].unshift('__edited_record');
+            newValue.push(flagValue['__edited_record']);
             continue;
           }
           newValue.push(flagValue[item]);
@@ -798,12 +862,23 @@ class Main extends Component {
         }
       });
       removeEditRecord = removeEditRecord.map(item => item.key);
-    } else if (isArray && data.__edited_record) {
-      removeEditRecord = data.__edited_record.map(item => {
-        if (item.type === 'remove') {
-          return item.key.toString();
+    } else {
+      if (Array.isArray(data)) {
+        removeEditRecord = data;
+        removeEditRecord = removeEditRecord.filter(item => {
+          if (item[0] === '__edited_record') {
+            return true;
+          }
+        });
+        // removeEditRecord = removeEditRecord;
+        if( removeEditRecord.length !== 0){
+          removeEditRecord = removeEditRecord[0].map(item => {
+            if(item.type === 'remove'){
+              return JSON.stringify(item.key);
+            }
+          });
         }
-      });
+      }
     }
     array = array.map((item, i) => {
       let flag = refernceFlag || '';
@@ -839,13 +914,16 @@ class Main extends Component {
         case 'array':
           // removed = removeEditRecord.indexOf(i) > -1 ? 'removed' : '';
           // console.log('array removed', removeEditRecord, i, removed)
+          console.log('array item', item, key, key[0])
           keyTitle = blockType === 'array' && item !== '__edited_record' ? '' : item;
+          const editedRecord = key[0] === '__edited_record' ? '__edited_record' : '';
           return (
             <div className={`array-child ${removed}`} key={key + i}>
               <ArrayBlock
                 refernceFlag={flag}
                 data={key}
                 keyTitle={keyTitle}
+                editedRecord={editedRecord}
                 blockType={'array'}
                 modeType={modeOptionType}
                 methods={{
@@ -961,6 +1039,7 @@ class Main extends Component {
   }
 
   renderDataEditTextarea() {
+    console.log('1---');
     const { updateScope, data, editScope } = this.state;
     let jsonData = data;
     let array = [];
@@ -982,12 +1061,27 @@ class Main extends Component {
     // jsonDataRECOVER
     console.log('jsonData', jsonData);
     if (typeof jsonData === 'object' && Array.isArray(jsonData)) {
+      removeEditRecord = [];
       if(jsonData.__edited_record){
         removeEditRecord = jsonData.__edited_record.map(item => {
           if (item.type === 'remove') {
             return item.key;
           }
+
         });
+      } else {
+
+        if (Array.isArray(jsonData[jsonData.length - 1])) {
+          removeEditRecord = jsonData[jsonData.length - 1];
+          removeEditRecord = removeEditRecord.filter(item => {
+            if (item.type === 'remove') {
+              return true;
+            }
+          });
+          removeEditRecord = removeEditRecord.map(item => {
+            return item.key;
+          });
+        }
       }
       //   return array   //
       jsonData = jsonData.map((item, i) => {
@@ -1026,6 +1120,14 @@ class Main extends Component {
           if (item.type === 'remove') {
             return item.key;
           }
+          if (item[0] === '__edited_record') {
+            const childArray = item.map(i => {
+              if (i.type === 'remove') {
+                return i.key;
+              }
+            });
+            return [...childArray];
+          }
         });
       }
       //   return object   //
@@ -1037,7 +1139,6 @@ class Main extends Component {
         });
       }
       jsonData = result.map((item, i) => {
-        // console.log('removeEditRecord', removeEditRecord, item);
         const removed = removeEditRecord.indexOf(item.item) > -1 ? true : false;
         console.log('jsonData removed', removed)
         if (item.item === '__edited_record') {

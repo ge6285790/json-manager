@@ -5,9 +5,9 @@ const ArrayBlock = (props) => {
   let keyTitle = props.keyTitle;
   // keyTitle = `"${keyTitle}": [`;
   keyTitle = keyTitle === '' ? '[' : `"${keyTitle}": [`;
-  const { blockType, refernceFlag, methods, modeType } = props;
+  const { blockType, refernceFlag, methods, modeType, editedRecord } = props;
   const { renderChild, jsonDataTempAdd, jsonDataEditTempAdd } = methods;
-  const edited = props.keyTitle === '__edited_record' ? '__edited_record' : '';
+  const edited = props.keyTitle === '__edited_record' ? '__edited_record' : false;
   if (modeType === 'send') {
     return (
       <div className="array-block">
@@ -25,7 +25,7 @@ const ArrayBlock = (props) => {
     );
   }
   return (
-    <div data-mode="edit" className={`array-block ${edited}`}>
+    <div data-mode="edit" className={`array-block ${editedRecord || edited}`}>
       <span
         onClick={() => {
           jsonDataEditTempAdd(refernceFlag);
