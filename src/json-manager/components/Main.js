@@ -1085,6 +1085,9 @@ class Main extends Component {
       }
       //   return array   //
       jsonData = jsonData.map((item, i) => {
+        // if (item[0] === '__edited_record') {
+        //   return '';
+        // }
         const removed = removeEditRecord.indexOf(i) > -1 ? true : false;
         return (
           <span
