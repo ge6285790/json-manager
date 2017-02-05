@@ -851,16 +851,96 @@ class Main extends Component {
     // }));
   }
 
-  // downloadJSONFile() {
-  //   const { data } = this.state;
-  //   let parseData = {...data};
-  //   let array = Object.keys(parseData);
-  //   for (const item of array) {
-  //     if (parseData[item]) {
-  //
-  //     }
-  //   }
-  // }
+  downloadJSONFile() {
+    const { data } = this.state;
+    let parseData = {...data};
+    // let array = Object.keys(parseData);
+    // for (const item of array) {
+    //   if (item === '__edited_record') {
+    //
+    //   }
+    //   if (parseData[item]) {
+    //
+    //   }
+    // }
+    this.parseData(parseData);
+    console.log(parseData);
+
+    const json = JSON.stringify(parseData);
+    const blob = new Blob([json], {type: "application/json"});
+    const url  = URL.createObjectURL(blob);
+    console.log(url);
+    window.open = url;
+
+    if (document.getElementById('json-file')) {
+      document.getElementById('json-file').href = url;
+      document.getElementById('json-file').click();
+      return;
+    }
+    const json_file = document.createElement('a');
+    json_file.setAttribute('id', 'json-file');
+    json_file.download    = "JSON_FILE.json";
+    json_file.href        = url;
+    json_file.textContent = "Download backup.json";
+    document.body.appendChild(json_file);
+    json_file.click();
+  }
+
+  parseData(data) {
+    this.adjustData(data);
+    if (typeof data === 'object' && Array.isArray(data)) {
+      data.map(item => {
+        this.parseData(item);
+      });
+    }
+    if (typeof data === 'object' && !Array.isArray(data)) {
+      let array = Object.keys(data);
+      for (const item of array) {
+        this.parseData(data[item]);
+      }
+    }
+  }
+
+  adjustData(data) {
+    let removeList;
+    // console.log('data', data, data[data.length - 1]);
+    // if (typeof data !== 'object' ||  !data[data.length - 1]) {
+    //   return;
+    // }
+    if (typeof data === 'object' && Array.isArray(data) && data.length !== 0) {
+      if (data[data.length - 1][0] === '__edited_record') {
+        console.log('1');
+        removeList = data[data.length - 1].filter(item => {
+          if (item.type === 'remove') {
+            return true;
+          }
+        });
+        removeList.map(item => {
+          data.splice(item.key, 1);
+          return item;
+        });
+        data.pop();
+      }
+    }
+    if (typeof data === 'object' && !Array.isArray(data)) {
+      console.log('2')
+      let array = Object.keys(data);
+      for (const item of array) {
+        if (item === '__edited_record') {
+          removeList = data.__edited_record.filter(item => {
+            if (item.type === 'remove'){
+              return true;
+            }
+          });
+          removeList.map(item => {
+            delete data[item.key];
+            return item;
+          });
+          delete data['__edited_record'];
+        }
+      }
+    }
+  }
 
   renderChild(data, blockType, refernceFlag, modeOptionType) {
     const isArray = Array.isArray(data);
