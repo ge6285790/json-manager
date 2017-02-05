@@ -14,6 +14,9 @@
     box-sizing: border-box;
     white-space: nowrap;
   }
+  #json-file{
+    display: none;
+  }
   .object-child, .array-child, .string-child{
     &.removed{
       *{
@@ -265,7 +268,6 @@
   }
 
   .setting-menu-edit{
-
     .textarea-edit{
       color: #333;
       cursor: default;

@@ -882,7 +882,7 @@ class Main extends Component {
     json_file.download    = "JSON_FILE.json";
     json_file.href        = url;
     json_file.textContent = "Download backup.json";
-    document.body.appendChild(json_file);
+    document.querySelector('.json-manager').appendChild(json_file);
     json_file.click();
   }
 
