@@ -411,6 +411,28 @@
           }
         }
       }
+      .get-json-by-drop{
+        padding: 12px 0px;
+        display: none;
+        &[data-active="true"]{
+          display: block;
+        }
+        .file-data{
+          width: 100%;
+          border: 1px solid;
+          border-style: dashed;
+          position: relative;
+          .paddingBottom{
+            width: 100%;
+            padding-bottom: 60%;
+          }
+          .dropzone{
+            >div{
+              margin-top: 10%;
+            }
+          }
+        }
+      }
       .get-json-by-api{
         padding: 12px 0px;
         display: none;

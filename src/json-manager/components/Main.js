@@ -7,6 +7,7 @@ import ObjectBlock from './objectBlock/ObjectBlock';
 import ArrayBlock from './arrayBlock/ArrayBlock';
 import StringBlock from './stringBlock/StringBlock';
 import * as actions from '../actions/actions';
+import Dropzone from 'react-dropzone';
 
 console.error = (() => {
   const error = console.error;
@@ -438,6 +439,7 @@ class Main extends Component {
     this.jsonDataTempAdd = this.jsonDataTempAdd.bind(this);
     this.jsonDataEditTempAdd = this.jsonDataEditTempAdd.bind(this);
     this.jsonDataREMOVE = this.jsonDataREMOVE.bind(this);
+    this.onDrop = this.onDrop.bind(this);
     this.addSubValueType = 'String';
     // jsonDataEditTempRemove: this.jsonDataEditTempRemove,
     const { option, crud, updateScope, modeOption } = props;
@@ -981,6 +983,20 @@ class Main extends Component {
         }
       }
     }
+  }
+
+  onDrop(acceptedFiles, rejectedFiles) {
+    // console.log('Accepted files: ', acceptedFiles);
+    // console.log('Rejected files: ', rejectedFiles);
+    const { actions: act } = this.props;
+    console.log('act', act);
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      // console.log(e.target.result);
+      act.jsonDataAction.apiGET(JSON.parse(e.target.result));
+    }
+    // console.log('acceptedFiles[0].preview', acceptedFiles[0].preview);
+    reader.readAsBinaryString(acceptedFiles[0]);
   }
 
   renderChild(data, blockType, refernceFlag, modeOptionType) {
@@ -1581,8 +1597,22 @@ class Main extends Component {
               <div className="api-send">
                 <div onClick={() => { this.apiGET(); }}>Send</div>
               </div>
-              <div className="close" onClick={() => { this.setState(update(this.state, { getJson: { visible: { $set: 'false' } } })); }}>×</div>
             </div>
+            <div className="get-json-by-drop" data-active={getJson.type === 'file' ? 'true' : 'false'}>
+              <div className="file-data" draggable="true" onDrop={(e) => { e.preventDefault();console.log('1', e); }} onDragover={(e) => { console.log('2', e); }}>
+                <div className="paddingBottom" />
+                <Dropzone className="dropzone" onDrop={this.onDrop} style={{width: '100%', height: '100%', position: 'absolute', top: '0px', left: '0px'}}>
+                  <div className="text-center">dropping JSON File here.</div>
+                </Dropzone>
+                {/* <textarea onChange={(e) => { act.jsonDataAction.crudDataUpdate({ type: 'read', value: e.target.value }); }} defaultValue="{}"></textarea> */}
+              </div>
+              {/* <p className="showError" data-active={crud.response === '' ? 'false' : 'true'}>*{crud.response}</p>
+              <div className="api-send">
+                <div onClick={() => { this.apiGET(); }}>Send</div>
+              </div>
+              <div className="close" onClick={() => { this.setState(update(this.state, { getJson: { visible: { $set: 'false' } } })); }}>×</div> */}
+            </div>
+            <div className="close" onClick={() => { this.setState(update(this.state, { getJson: { visible: { $set: 'false' } } })); }}>×</div>
           </div>
         </div>
       </div>
