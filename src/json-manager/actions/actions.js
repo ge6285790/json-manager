@@ -22,8 +22,14 @@ export function apiGET(data) {
   };
 }
 
+export function jsonResponseUPDATE(data) {
+  return {
+    type: types.CRUD_RESPONSE_UPDATE,
+    data,
+  };
+}
+
 export function jsonDataUPDATE(data) {
-  console.log('jsonDataUPDATE(data)', data);
   return {
     type: types.JSON_DATA_UPDATE,
     data,
@@ -61,6 +67,13 @@ export function jsonDataEditTempRemove(data) {
 export function crudUrlUpdate(data) {
   return {
     type: types.CRUD_URL_UPDATE,
+    data,
+  };
+}
+
+export function crudDataUpdate(data) {
+  return {
+    type: types.CRUD_DATA_UPDATE,
     data,
   };
 }

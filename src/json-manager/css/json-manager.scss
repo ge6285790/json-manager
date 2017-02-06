@@ -42,7 +42,7 @@
       // width: 40px;
       padding: 6px;
       // height: 24px;
-      color: #bbb;
+      color: #888;
       border: 0px solid #333;
       background: #ddd;
       cursor: pointer;
@@ -57,6 +57,40 @@
           color: #fff;
         }
       }
+    }
+  }
+  .import-json-button{
+    position: fixed;
+    z-index: 2;
+    top: 60px;
+    right: 384px;
+    align-items: flex-start;
+    text-align: center;
+    cursor: default;
+    color: buttontext;
+    background-color: buttonface;
+    box-sizing: border-box;
+    padding: 2px 6px 3px;
+    border-width: 2px;
+    border-style: outset;
+    border-color: buttonface;
+    border-image: initial;
+    text-rendering: auto;
+    color: #333 !important;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-transform: none;
+    text-indent: 0px;
+    text-shadow: none;
+    display: inline-block;
+    text-align: start;
+    margin: 0em 0em 0em 0em;
+    font: 11px BlinkMacSystemFont;
+    &:active{
+      background: #09f;
+      border: 0px;
+      border-radius: 3px;
+      padding: 0px 6px;
     }
   }
   .string-child{
@@ -251,16 +285,6 @@
                 color: #333;
               }
             }
-            .api-send{
-              text-align: right;
-              margin-top: 24px;
-              > div{
-                display: inline-block;
-                padding: 6px 16px;
-                background: #DA6C75;
-                color: #fff;
-              }
-            }
           }
         }
       }
@@ -344,15 +368,123 @@
       margin-left: 6px;
     }
   }
-
-  .createNew{
-    padding: 24px;
+  .import-json-modal{
     position: fixed;
-    right: 0px;
-    bottom: 0px;
+    width: 100%;
+    // display: none;
+    transition: 0.5s ease;
+    transform: translateY(-200%);
+    opacity: 0;
+    &[data-active="true"]{
+      opacity: 1;
+      transform: translateY(0%);
+    }
+    .modal-body{
+      position: relative;
+      max-width: 600px;
+      display: inline-block;
+      width: 100%;
+      margin-top: 100px;
+      background: #fff;
+      border: 1px solid #333;
+      padding: 24px;
+      *{
+        color: #333;
+      }
+      .switch-tag{
+        margin-top: 24px;
+        height: 30px;
+        width: 100%;
+        .tag{
+          float:left;
+          height: 30px;
+          line-height: 30px;
+          text-align: center;
+          width: 60px;
+          border-bottom: 2px solid #aaa;
+          color: #aaa;
+          cursor: pointer;
+          transition: 0.3s ease;
+          &[data-active="true"], &:hover{
+            color: #333;
+            border-bottom: 2px solid #333;
+          }
+        }
+      }
+      .get-json-by-api{
+        padding: 12px 0px;
+        display: none;
+        &[data-active="true"]{
+          display: block;
+        }
+        .api-type{
+          display: flex;
+          select{
+            width: 57px;
+            // flex: 1;
+            margin-right: 6px;
+          }
+          input{
+            flex: 1;
+          }
+        }
+        .post-data{
+          margin-top: 24px;
+          p{
+            margin-bottom: 12px;
+          }
+          textarea{
+            width: 100%;
+            height: 200px;
+            resize: none;
+            padding: 12px;
+          }
+        }
+      }
+      .showError{
+        height: 0px;
+        overflow: hidden;
+        margin-top: 12px;
+        color: #333;
+        transition: 0.3s ease;
+        &[data-active="true"]{
+          height: auto;
+          color: red;
+        }
+      }
+      .close{
+        position: absolute;
+        top: 24px;
+        right: 24px;
+        padding: 6px;
+        cursor: pointer;
+        transition: 0.3s ease;
+        background: transparent;
+        &:hover{
+          background: #000;
+          color: #fff;
+        }
+      }
+    }
+
+
+  }
+  .api-send{
+    text-align: right;
+    margin-top: 24px;
+    > div{
+      display: inline-block;
+      padding: 6px 16px;
+      background: #DA6C75;
+      color: #fff !important;
+      cursor: pointer;
+    }
   }
   .text-right{
     text-align: right;
+  }
+  .text-left{
+    text-align: left;
   }
   .float-right{
     float: right;

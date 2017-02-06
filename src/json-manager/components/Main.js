@@ -447,6 +447,10 @@ class Main extends Component {
       editScope: option.editScope,
       data: option.defaultData || {},
       crud,
+      getJson: {
+        visible: 'false',
+        type: 'api',
+      },
       // sendApi: {
       //   type: 'update',
       // }
@@ -454,7 +458,7 @@ class Main extends Component {
   }
 
   componentDidMount() {
-    this.apiGET('aa', 'month1');
+    this.apiGET();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -465,6 +469,10 @@ class Main extends Component {
       editScope: option.editScope,
       data: option.defaultData || {},
       crud,
+      getJson: {
+        visible: 'false',
+        type: 'api',
+      },
       // sendApi: {
       //   type: 'update',
       // }
@@ -478,27 +486,60 @@ class Main extends Component {
 
   apiGET() {
     const { actions: act, crud } = this.props;
-    const { url, refernceFlag } = crud.read;
-    request.get(url)
-      .set('Accept', 'application/json')
-      .end((err, res) => {
-        if (err || res.status !== 200) {
-          console.log(new Error(err));
-        } else {
-          if (refernceFlag === '') {
-            act.jsonDataAction.apiGET(res.body);
-            return;
-          }
+    const { url, refernceFlag, type, data } = crud.read;
+    if (url === '') {
+      return;
+    }
+    if (type === 'GET') {
+      request.get(url)
+        .set('Accept', 'application/json')
+        .end((err, res) => {
+          if (err || res.status !== 200) {
+            // console.log(new Error(err));
+            act.jsonDataAction.jsonResponseUPDATE((err).toString());
+          } else {
+            if (refernceFlag === '') {
+              act.jsonDataAction.apiGET(res.body);
+              act.jsonDataAction.jsonResponseUPDATE('');
+              return;
+            }
 
-          const arrayFlags = refernceFlag.split('>');
-          let result = res.body;
+            const arrayFlags = refernceFlag.split('>');
+            let result = res.body;
 
-          for (const item of arrayFlags) {
-            result = result[item];
+            for (const item of arrayFlags) {
+              result = result[item];
+            }
+            act.jsonDataAction.apiGET(result);
+            act.jsonDataAction.jsonResponseUPDATE('');
           }
-          act.jsonDataAction.apiGET(result);
-        }
-      });
+        });
+    } else {
+      request.post(url)
+        .set('Accept', 'application/json')
+        .send(data)
+        .end((err, res) => {
+          if (err || res.status !== 200) {
+            // console.log(new Error(err));
+            act.jsonDataAction.jsonResponseUPDATE((err).toString());
+          } else {
+            if (refernceFlag === '') {
+              act.jsonDataAction.apiGET(res.body);
+              act.jsonDataAction.jsonResponseUPDATE('');
+              return;
+            }
+
+            const arrayFlags = refernceFlag.split('>');
+            let result = res.body;
+
+            for (const item of arrayFlags) {
+              result = result[item];
+            }
+            act.jsonDataAction.apiGET(result);
+            act.jsonDataAction.jsonResponseUPDATE('');
+          }
+        });
+    }
     // fetch(url, { method: type, data })
     //   .then(response => response.json())
     //   .then((jsonData) => {
@@ -1330,7 +1371,8 @@ class Main extends Component {
   }
 
   render() {
-    const { data, updateScope, crud, modeOption, editScope } = this.state;
+    const { actions: act } = this.props;
+    const { data, updateScope, crud, modeOption, editScope, getJson } = this.state;
     const blockType = Array.isArray(data) ? 'array' : 'default';
     console.log('modeOption', modeOption);
     // let refernceFlagInputValue = '';
@@ -1343,6 +1385,12 @@ class Main extends Component {
           <button data-active={modeOption.type === 'edit' ? 'true' : ''} onClick={() => { this.modeTypeUpdate('edit'); }}>Edit Mode</button>
           <button data-active={modeOption.type === 'send' ? 'true' : ''} onClick={() => { this.modeTypeUpdate('send'); }}>Send Mode</button>
         </div>
+        <button
+          className="import-json-button"
+          onClick={() => { getJson.visible === 'true' ? this.setState(update(this.state, { getJson: { visible: { $set: 'false' } } })) : this.setState(update(this.state, { getJson: { visible: { $set: 'true' } } })); }}
+        >
+          Import JSON By API / FILE
+        </button>
         <ObjectBlock
           data={data}
           methods={{ renderChild: this.renderChild, jsonDataEditTempAdd: this.jsonDataEditTempAdd }}
@@ -1507,8 +1555,36 @@ class Main extends Component {
             </li>
           </ul>
         </div>
+
         {/* <div className="createNew">
         </div> */}
+        <div className="import-json-modal text-center" data-active={getJson.visible}>
+          <div className="modal-body text-left">
+            <h3>Import JSON</h3>
+            <div className="switch-tag clearfix">
+              <div className="tag" data-active={getJson.type === 'api' ? 'true' : 'false'} onClick={() => { this.setState(update(this.state, { getJson: { type: { $set: 'api' } } })); }}>API</div>
+              <div className="tag" data-active={getJson.type === 'file' ? 'true' : 'false'} onClick={() => { this.setState(update(this.state, { getJson: { type: { $set: 'file' } } })); }}>FILE</div>
+            </div>
+            <div className="get-json-by-api" data-active={getJson.type === 'api' ? 'true' : 'false'}>
+              <div className="api-type">
+                <select defaultValue={crud.read.type} onChange={(e) => { act.jsonDataAction.crudTypeUpdate({ type: 'read', crudType: e.target.value }); }}>
+                  <option value="GET">GET</option>
+                  <option value="POST">POST</option>
+                </select>
+                <input defaultValue={crud.read.url} onBlur={(e) => { act.jsonDataAction.crudUrlUpdate({ type: 'read', url: e.target.value }); }} />
+              </div>
+              <div className="post-data">
+                <p>POST data：</p>
+                <textarea onChange={(e) => { act.jsonDataAction.crudDataUpdate({ type: 'read', value: e.target.value }); }} defaultValue="{}"></textarea>
+              </div>
+              <p className="showError" data-active={crud.response === '' ? 'false' : 'true'}>*{crud.response}</p>
+              <div className="api-send">
+                <div onClick={() => { this.apiGET(); }}>Send</div>
+              </div>
+              <div className="close" onClick={() => { this.setState(update(this.state, { getJson: { visible: { $set: 'false' } } })); }}>×</div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

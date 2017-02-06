@@ -7,6 +7,7 @@ const crud = {
     url: 'https://store.readmoo.com/api/reading17/get',
     // url: 'https://www.youtube.com/feed_ajax?action_get_unseen_notification_count=1',
     type: 'POST',
+    data: {},
   },
   read: {
     url: 'https://store.readmoo.com/api/reading17/get',
@@ -25,6 +26,7 @@ const crud = {
     url: 'dd',
     refernceFlag: 'title>id',
   },
+  response: '',
 };
 
 export default function (state = crud, action) {
@@ -35,11 +37,21 @@ export default function (state = crud, action) {
           url: { $set: action.data.url },
         },
       });
+    case types.CRUD_DATA_UPDATE:
+      return update(state, {
+        [action.data.type]: {
+          data: { $set: action.data.value },
+        },
+      });
     case types.CRUD_TYPE_UPDATE:
       return update(state, {
         [action.data.type]: {
           type: { $set: action.data.crudType },
         },
+      });
+    case types.CRUD_RESPONSE_UPDATE:
+      return update(state, {
+        response: { $set: action.data }
       });
     default:
       return state;
