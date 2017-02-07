@@ -7,9 +7,10 @@ import css from './css/json-manager.scss';
 import store from './store/store';
 
 
-function Jmgr(option, crud, elementId) {
+function Jmgr(option) {
+  const { defaultData, crud, elementId } = option;
   this.data = {
-    option,
+    defaultData,
     crud,
     elementId,
   };
@@ -28,9 +29,9 @@ function Jmgr(option, crud, elementId) {
     render(
       <Provider store={store}>
         {/* <Main data={this.data} /> */}
-        <Main />
+        <Main jmgr={this} />
       </Provider>,
-      document.getElementById(elementId));
+      document.getElementById(this.data.elementId));
   };
 }
 

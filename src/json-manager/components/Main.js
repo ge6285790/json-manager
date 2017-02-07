@@ -3,11 +3,13 @@ import update from 'react-addons-update';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import request from 'superagent';
+import Dropzone from 'react-dropzone';
 import ObjectBlock from './objectBlock/ObjectBlock';
 import ArrayBlock from './arrayBlock/ArrayBlock';
 import StringBlock from './stringBlock/StringBlock';
 import * as actions from '../actions/actions';
-import Dropzone from 'react-dropzone';
+import * as actionsCrud from '../actions/actions_crud';
+
 
 console.error = (() => {
   const error = console.error;
@@ -427,6 +429,7 @@ function mapDispatchToProps(dispatch) {
   return {
     actions: {
       jsonDataAction: bindActionCreators(actions, dispatch),
+      actionsCrud: bindActionCreators(actionsCrud, dispatch),
     },
   };
 }
@@ -434,6 +437,7 @@ function mapDispatchToProps(dispatch) {
 class Main extends Component {
   constructor(props) {
     super(props);
+    console.log('props', props);
     this.renderChild = this.renderChild.bind(this);
     this.jsonDataUPDATE = this.jsonDataUPDATE.bind(this);
     this.jsonDataTempAdd = this.jsonDataTempAdd.bind(this);
@@ -460,7 +464,64 @@ class Main extends Component {
   }
 
   componentDidMount() {
+    const { jmgr } = this.props;
     this.apiGET();
+
+    jmgr.style = () => {
+      console.log('style');
+    };
+
+    jmgr.crud = {
+      create: () => {
+        console.log('create');
+      },
+
+      read: () => {
+        console.log('read');
+      },
+
+      update: () => {
+        console.log('update');
+      },
+
+      delete: () => {
+        console.log('delete');
+      },
+    };
+
+    jmgr.modeChange = () => {
+      console.log('modeChange');
+    };
+
+    jmgr.importJSON = () => {
+      console.log('import');
+    };
+
+    jmgr.exportJSON = () => {
+      console.log('export');
+    };
+
+    jmgr.edit = {
+      flagSelect: () => {
+        console.log('flagSelect');
+      },
+
+      typeChange: () => {
+        console.log('typeChange');
+      },
+
+      create: () => {
+        console.log('create');
+      },
+
+      remove: () => {
+        console.log('remove');
+      },
+
+      recover: () => {
+        console.log('recover');
+      },
+    };
   }
 
   componentWillReceiveProps(nextProps) {
@@ -498,11 +559,11 @@ class Main extends Component {
         .end((err, res) => {
           if (err || res.status !== 200) {
             // console.log(new Error(err));
-            act.jsonDataAction.jsonResponseUPDATE((err).toString());
+            act.actionsCrud.crudResponseUPDATE((err).toString());
           } else {
             if (refernceFlag === '') {
               act.jsonDataAction.apiGET(res.body);
-              act.jsonDataAction.jsonResponseUPDATE('');
+              act.actionsCrud.crudResponseUPDATE('');
               return;
             }
 
@@ -513,7 +574,7 @@ class Main extends Component {
               result = result[item];
             }
             act.jsonDataAction.apiGET(result);
-            act.jsonDataAction.jsonResponseUPDATE('');
+            act.actionsCrud.crudResponseUPDATE('');
           }
         });
     } else {
@@ -523,11 +584,11 @@ class Main extends Component {
         .end((err, res) => {
           if (err || res.status !== 200) {
             // console.log(new Error(err));
-            act.jsonDataAction.jsonResponseUPDATE((err).toString());
+            act.actionsCrud.crudResponseUPDATE((err).toString());
           } else {
             if (refernceFlag === '') {
               act.jsonDataAction.apiGET(res.body);
-              act.jsonDataAction.jsonResponseUPDATE('');
+              act.actionsCrud.crudResponseUPDATE('');
               return;
             }
 
@@ -538,7 +599,7 @@ class Main extends Component {
               result = result[item];
             }
             act.jsonDataAction.apiGET(result);
-            act.jsonDataAction.jsonResponseUPDATE('');
+            act.actionsCrud.crudResponseUPDATE('');
           }
         });
     }
@@ -705,12 +766,12 @@ class Main extends Component {
 
   crudUrlUpdate(type, url) {
     const { actions: act } = this.props;
-    act.jsonDataAction.crudUrlUpdate({ type, url });
+    act.actionsCrud.crudUrlUpdate({ type, url });
   }
 
   crudTypeUpdate(type, crudType) {
     const { actions: act } = this.props;
-    act.jsonDataAction.crudTypeUpdate({ type, crudType });
+    act.actionsCrud.crudTypeUpdate({ type, crudType });
   }
 
   jsonDataTempAdd(flag) {
@@ -1583,15 +1644,15 @@ class Main extends Component {
             </div>
             <div className="get-json-by-api" data-active={getJson.type === 'api' ? 'true' : 'false'}>
               <div className="api-type">
-                <select defaultValue={crud.read.type} onChange={(e) => { act.jsonDataAction.crudTypeUpdate({ type: 'read', crudType: e.target.value }); }}>
+                <select defaultValue={crud.read.type} onChange={(e) => { act.actionsCrud.crudTypeUpdate({ type: 'read', crudType: e.target.value }); }}>
                   <option value="GET">GET</option>
                   <option value="POST">POST</option>
                 </select>
-                <input defaultValue={crud.read.url} onBlur={(e) => { act.jsonDataAction.crudUrlUpdate({ type: 'read', url: e.target.value }); }} />
+                <input defaultValue={crud.read.url} onBlur={(e) => { act.actionsCrud.crudUrlUpdate({ type: 'read', url: e.target.value }); }} />
               </div>
               <div className="post-data">
                 <p>POST data：</p>
-                <textarea onChange={(e) => { act.jsonDataAction.crudDataUpdate({ type: 'read', value: e.target.value }); }} defaultValue="{}"></textarea>
+                <textarea onChange={(e) => { act.actionsCrud.crudDataUpdate({ type: 'read', value: e.target.value }); }} defaultValue="{}"></textarea>
               </div>
               <p className="showError" data-active={crud.response === '' ? 'false' : 'true'}>*{crud.response}</p>
               <div className="api-send">
@@ -1599,7 +1660,7 @@ class Main extends Component {
               </div>
             </div>
             <div className="get-json-by-drop" data-active={getJson.type === 'file' ? 'true' : 'false'}>
-              <div className="file-data" draggable="true" onDrop={(e) => { e.preventDefault();console.log('1', e); }} onDragover={(e) => { console.log('2', e); }}>
+              <div className="file-data">
                 <div className="paddingBottom" />
                 <Dropzone className="dropzone" onDrop={this.onDrop} style={{width: '100%', height: '100%', position: 'absolute', top: '0px', left: '0px'}}>
                   <div className="text-center">dropping JSON File here.</div>

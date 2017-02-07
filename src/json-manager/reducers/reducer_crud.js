@@ -1,4 +1,4 @@
-import * as types from '../constants/actionTypes';
+import * as types from '../constants/constants_crud';
 import update from 'react-addons-update';
 
 const crud = {
@@ -19,12 +19,15 @@ const crud = {
   update: {
     url: 'cc',
     type: 'GET',
+    data: {},
     // refernceFlag: '>month1>arrayIndex>day',
-    id: 'day', // default '';
+    // id: 'day', // default '';
   },
   delete: {
     url: 'dd',
-    refernceFlag: 'title>id',
+    type: 'GET',
+    data: {},
+    // refernceFlag: 'title>id',
   },
   response: '',
 };
