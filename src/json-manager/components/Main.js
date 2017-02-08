@@ -9,6 +9,7 @@ import ArrayBlock from './arrayBlock/ArrayBlock';
 import StringBlock from './stringBlock/StringBlock';
 import * as actions from '../actions/actions';
 import * as actionsCrud from '../actions/actions_crud';
+import * as actionsMode from '../actions/actions_mode';
 
 
 console.error = (() => {
@@ -430,6 +431,7 @@ function mapDispatchToProps(dispatch) {
     actions: {
       jsonDataAction: bindActionCreators(actions, dispatch),
       actionsCrud: bindActionCreators(actionsCrud, dispatch),
+      actionsMode: bindActionCreators(actionsMode, dispatch),
     },
   };
 }
@@ -465,11 +467,31 @@ class Main extends Component {
 
   componentDidMount() {
     const { jmgr } = this.props;
+    const that = this;
     this.apiGET();
 
     jmgr.style = () => {
       console.log('style');
     };
+
+    jmgr.mode = {
+      // importMode => show import modal or not
+      // visible is boolean string,
+      // 'true' => show import modal,
+      // 'false' => hide import modal
+      importMode: (visible) => {
+        const boolean = visible || (document.querySelector('.import-json-modal').dataset.active === 'false' ? 'true' : 'false');
+        that.modeImportModalUpdate('visible', boolean);
+      },
+
+      editMode: () => {
+        that.modeTypeUpdate('edit');
+      },
+
+      sendMode: () => {
+        that.modeTypeUpdate('send');
+      },
+    }
 
     jmgr.crud = {
       create: () => {
@@ -544,8 +566,14 @@ class Main extends Component {
 
   modeTypeUpdate(type) {
     const { actions: act } = this.props;
-    act.jsonDataAction.modeTypeUpdate(type);
+    act.actionsMode.modeTypeUpdate(type);
   }
+
+  modeImportModalUpdate(key, value) {
+    const { actions: act } = this.props;
+    act.actionsMode.modeImportModalUpdate({ key, value });
+  }
+
 
   apiGET() {
     const { actions: act, crud } = this.props;
@@ -564,6 +592,7 @@ class Main extends Component {
             if (refernceFlag === '') {
               act.jsonDataAction.apiGET(res.body);
               act.actionsCrud.crudResponseUPDATE('');
+              this.modeImportModalUpdate('visible', 'false');
               return;
             }
 
@@ -575,6 +604,7 @@ class Main extends Component {
             }
             act.jsonDataAction.apiGET(result);
             act.actionsCrud.crudResponseUPDATE('');
+            this.modeImportModalUpdate('visible', 'false');
           }
         });
     } else {
@@ -589,6 +619,7 @@ class Main extends Component {
             if (refernceFlag === '') {
               act.jsonDataAction.apiGET(res.body);
               act.actionsCrud.crudResponseUPDATE('');
+              this.modeImportModalUpdate('visible', 'false');
               return;
             }
 
@@ -600,6 +631,7 @@ class Main extends Component {
             }
             act.jsonDataAction.apiGET(result);
             act.actionsCrud.crudResponseUPDATE('');
+            this.modeImportModalUpdate('visible', 'false');
           }
         });
     }
@@ -1052,10 +1084,11 @@ class Main extends Component {
     const { actions: act } = this.props;
     console.log('act', act);
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = (e) => {
       // console.log(e.target.result);
+      this.modeImportModalUpdate('visible', 'false');
       act.jsonDataAction.apiGET(JSON.parse(e.target.result));
-    }
+    };
     // console.log('acceptedFiles[0].preview', acceptedFiles[0].preview);
     reader.readAsBinaryString(acceptedFiles[0]);
   }
@@ -1448,10 +1481,14 @@ class Main extends Component {
   }
 
   render() {
-    const { actions: act } = this.props;
-    const { data, updateScope, crud, modeOption, editScope, getJson } = this.state;
+    const { actions: act, jmgr } = this.props;
+    act.actionsCrud.crudStateUpdate(jmgr.data.crud);
+    const { data, updateScope, crud, modeOption, editScope } = this.state;
     const blockType = Array.isArray(data) ? 'array' : 'default';
-    console.log('modeOption', modeOption);
+    const { importModal, type } = modeOption;
+    console.log(jmgr);
+
+    console.log('modeOption', modeOption, crud);
     // let refernceFlagInputValue = '';
     // if (updateScope.flags.length !== 0) {
     //   refernceFlagInputValue = updateScope.flags.reduce((prev, next) => `${prev}, ${next}`);
@@ -1464,7 +1501,7 @@ class Main extends Component {
         </div>
         <button
           className="import-json-button"
-          onClick={() => { getJson.visible === 'true' ? this.setState(update(this.state, { getJson: { visible: { $set: 'false' } } })) : this.setState(update(this.state, { getJson: { visible: { $set: 'true' } } })); }}
+          onClick={() => { importModal.visible === 'true' ? this.modeImportModalUpdate('visible', 'false') : this.modeImportModalUpdate('visible', 'true'); }}
         >
           Import JSON By API / FILE
         </button>
@@ -1635,14 +1672,14 @@ class Main extends Component {
 
         {/* <div className="createNew">
         </div> */}
-        <div className="import-json-modal text-center" data-active={getJson.visible}>
+        <div className="import-json-modal text-center" data-active={importModal.visible}>
           <div className="modal-body text-left">
             <h3>Import JSON</h3>
             <div className="switch-tag clearfix">
-              <div className="tag" data-active={getJson.type === 'api' ? 'true' : 'false'} onClick={() => { this.setState(update(this.state, { getJson: { type: { $set: 'api' } } })); }}>API</div>
-              <div className="tag" data-active={getJson.type === 'file' ? 'true' : 'false'} onClick={() => { this.setState(update(this.state, { getJson: { type: { $set: 'file' } } })); }}>FILE</div>
+              <div className="tag" data-active={importModal.type === 'api' ? 'true' : 'false'} onClick={() => { this.modeImportModalUpdate('type', 'api'); }}>API</div>
+              <div className="tag" data-active={importModal.type === 'file' ? 'true' : 'false'} onClick={() => { this.modeImportModalUpdate('type', 'file'); }}>FILE</div>
             </div>
-            <div className="get-json-by-api" data-active={getJson.type === 'api' ? 'true' : 'false'}>
+            <div className="get-json-by-api" data-active={importModal.type === 'api' ? 'true' : 'false'}>
               <div className="api-type">
                 <select defaultValue={crud.read.type} onChange={(e) => { act.actionsCrud.crudTypeUpdate({ type: 'read', crudType: e.target.value }); }}>
                   <option value="GET">GET</option>
@@ -1659,7 +1696,7 @@ class Main extends Component {
                 <div onClick={() => { this.apiGET(); }}>Send</div>
               </div>
             </div>
-            <div className="get-json-by-drop" data-active={getJson.type === 'file' ? 'true' : 'false'}>
+            <div className="get-json-by-drop" data-active={importModal.type === 'file' ? 'true' : 'false'}>
               <div className="file-data">
                 <div className="paddingBottom" />
                 <Dropzone className="dropzone" onDrop={this.onDrop} style={{width: '100%', height: '100%', position: 'absolute', top: '0px', left: '0px'}}>
@@ -1673,7 +1710,7 @@ class Main extends Component {
               </div>
               <div className="close" onClick={() => { this.setState(update(this.state, { getJson: { visible: { $set: 'false' } } })); }}>×</div> */}
             </div>
-            <div className="close" onClick={() => { this.setState(update(this.state, { getJson: { visible: { $set: 'false' } } })); }}>×</div>
+            <div className="close" onClick={() => { this.modeImportModalUpdate('visible', 'false'); }}>×</div>
           </div>
         </div>
       </div>

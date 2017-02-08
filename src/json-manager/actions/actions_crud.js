@@ -1,5 +1,12 @@
 import * as types from '../constants/constants_crud';
 
+export function crudStateUpdate(data) {
+  return {
+    type: types.CRUD_STATE_UPDATE,
+    data,
+  };
+}
+
 export function crudUrlUpdate(data) {
   return {
     type: types.CRUD_URL_UPDATE,

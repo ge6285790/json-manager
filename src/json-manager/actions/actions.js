@@ -8,12 +8,12 @@
 // }
 import * as types from '../constants/actionTypes';
 
-export function modeTypeUpdate(data) {
-  return {
-    type: types.MODE_TYPE_UPDATE,
-    data,
-  };
-}
+// export function modeTypeUpdate(data) {
+//   return {
+//     type: types.MODE_TYPE_UPDATE,
+//     data,
+//   };
+// }
 
 export function apiGET(data) {
   return {

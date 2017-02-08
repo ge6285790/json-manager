@@ -1,4 +1,5 @@
-export const MODE_TYPE_UPDATE = 'MODE_TYPE_UPDATE';
+// export const MODE_TYPE_UPDATE = 'MODE_TYPE_UPDATE';
+// export const MODE_IMPORT_MODAL_UPDATE = 'MODE_IMPORT_MODAL_UPDATE';
 
 export const API_GET = 'API_GET';
 export const JSON_DATA_UPDATE = 'JSON_DATA_UPDATE';
