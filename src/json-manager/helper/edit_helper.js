@@ -10,48 +10,99 @@ function guid() {
   return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
 }
 
+function getFlagDataAndLastKey(object, flag) {
+  console.log('---------getFlagDataAndLastKey---------');
+  let obj = object;
+  while (flag.length > 1) {
+    let key = flag.shift();
+    key = isNaN(parseInt(key, 10)) ? key : parseInt(key, 10);
+    obj = obj[key];
+  }
+
+  let lastKey = flag.shift();
+  lastKey = isNaN(parseInt(lastKey, 10)) ? lastKey : parseInt(lastKey, 10);
+
+  return {
+    obj,
+    lastKey,
+  };
+}
+
+function editedRecordUpdateInArray(object, data) {
+  console.log('---------editedRecordUpdateInArray---------');
+  const obj = object;
+  let newEditedRecord = obj.filter((item) => {
+    if (item[0] === '__edited_record') {
+      return true;
+    }
+    return false;
+  });
+  if (newEditedRecord.length === 0) {
+    newEditedRecord = ['__edited_record'];
+  } else {
+    newEditedRecord = newEditedRecord[0];
+    const indexNumber = obj.indexOf(newEditedRecord);
+    obj.splice(indexNumber, 1);
+  }
+
+  newEditedRecord.push(data);
+
+  obj.push(newEditedRecord);
+}
+
 export function updateObject(object, newValue, flag) {
   let obj = object;
 
-  while (flag.length > 1) {
-    let index = flag.shift();
-    index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
-    obj = obj[index];
-  }
+  const flagDataAndLastKey = getFlagDataAndLastKey(obj, flag);
+  const index = flagDataAndLastKey.lastKey;
+  obj = flagDataAndLastKey.obj;
 
-  let index = flag.shift();
-  index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
-
+  /*
+  Record old value
+  */
   const oldValue = Object.assign(obj[index], {});
 
+  /*
+  if values are even, stop function
+  */
   if (obj[index] === newValue) {
     return;
   }
+
+  /*
+  update new value
+  */
   obj[index] = newValue;
   console.log('obj type', obj);
 
   if (Array.isArray(obj)) {
-    let newEditedRecord = obj.filter((item) => {
-      if (item[0] === '__edited_record') {
-        return true;
-      }
-      return false;
-    });
-    if (newEditedRecord.length === 0) {
-      newEditedRecord = ['__edited_record'];
-    } else {
-      newEditedRecord = newEditedRecord[0];
-      const indexNumber = obj.indexOf(newEditedRecord);
-      obj.splice(indexNumber, 1);
-    }
-    // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
-
-    newEditedRecord.push({
+    // let newEditedRecord = obj.filter((item) => {
+    //   if (item[0] === '__edited_record') {
+    //     return true;
+    //   }
+    //   return false;
+    // });
+    // if (newEditedRecord.length === 0) {
+    //   newEditedRecord = ['__edited_record'];
+    // } else {
+    //   newEditedRecord = newEditedRecord[0];
+    //   const indexNumber = obj.indexOf(newEditedRecord);
+    //   obj.splice(indexNumber, 1);
+    // }
+    //
+    // newEditedRecord.push({
+    //   key: index,
+    //   type: `[Object Value Update]: '${JSON.stringify(oldValue)}' convert to '${JSON.stringify(newValue)}'`,
+    // });
+    //
+    // obj.push(newEditedRecord);
+    //
+    const data = {
       key: index,
       type: `[Object Value Update]: '${JSON.stringify(oldValue)}' convert to '${JSON.stringify(newValue)}'`,
-    });
+    };
 
-    obj.push(newEditedRecord);
+    editedRecordUpdateInArray(obj, data);
     return;
   }
 
@@ -89,13 +140,18 @@ export function addObject(object, newValue, flag) {
     object['__edited_record'] = newEditedRecord;
     return;
   }
-  while (flag.length > 1) {
-    let index = flag.shift();
-    index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
-    object = object[index];
-  }
-  let index = flag.shift();
-  index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
+  // while (flag.length > 1) {
+  //   let index = flag.shift();
+  //   index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
+  //   object = object[index];
+  // }
+  // let index = flag.shift();
+  // index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
+
+  const flagDataAndLastKey = getFlagDataAndLastKey(object, flag);
+  const index = flagDataAndLastKey.lastKey;
+  object = flagDataAndLastKey.obj;
+
   // const oldValue = Object.assign(object[index], {});
   // const oldValue = {...object[index]};
   // if (object[index] === newValue) {
@@ -122,28 +178,35 @@ export function addObject(object, newValue, flag) {
     } else {
       console.log(3);
       object[index].push({...newValue});
+      //
+      // let newEditedRecord = object[index].filter(item => {
+      //   if (item[0] === '__edited_record') {
+      //     return true;
+      //   }
+      // });
+      // console.log('newEditedRecord', newEditedRecord);
+      // if (newEditedRecord.length === 0) {
+      //   newEditedRecord = ['__edited_record']
+      // } else {
+      //   newEditedRecord = newEditedRecord[0];
+      //   const indexNumber = object[index].indexOf(newEditedRecord);
+      //   object[index].splice(indexNumber, 1);
+      // }
+      // // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
+      //
+      // newEditedRecord.push({
+      //   key: newKey,
+      //   type: `[Object Value Update]: create new value`,
+      // });
+      //
+      // object[index].push(newEditedRecord);
 
-      let newEditedRecord = object[index].filter(item => {
-        if (item[0] === '__edited_record') {
-          return true;
-        }
-      });
-      console.log('newEditedRecord', newEditedRecord);
-      if (newEditedRecord.length === 0) {
-        newEditedRecord = ['__edited_record']
-      } else {
-        newEditedRecord = newEditedRecord[0];
-        const indexNumber = object[index].indexOf(newEditedRecord);
-        object[index].splice(indexNumber, 1);
-      }
-      // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
-
-      newEditedRecord.push({
+      const data = {
         key: newKey,
         type: `[Object Value Update]: create new value`,
-      });
+      };
 
-      object[index].push(newEditedRecord);
+      editedRecordUpdateInArray(object[index], data);
       return;
     }
   } else {
@@ -163,26 +226,33 @@ export function addObject(object, newValue, flag) {
       object[index]['__edited_record'] = newEditedRecord;
     } else {
       object[index].push(newValue);
-      let newEditedRecord = object[index].filter(item => {
-        if (item[0] === '__edited_record') {
-          return true;
-        }
-      });
-      if (newEditedRecord.length === 0) {
-        newEditedRecord = ['__edited_record']
-      } else {
-        newEditedRecord = newEditedRecord[0];
-        const indexNumber = object[index].indexOf(newEditedRecord);
-        object[index].splice(indexNumber, 1);
-      }
-      // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
+      // let newEditedRecord = object[index].filter(item => {
+      //   if (item[0] === '__edited_record') {
+      //     return true;
+      //   }
+      // });
+      // if (newEditedRecord.length === 0) {
+      //   newEditedRecord = ['__edited_record']
+      // } else {
+      //   newEditedRecord = newEditedRecord[0];
+      //   const indexNumber = object[index].indexOf(newEditedRecord);
+      //   object[index].splice(indexNumber, 1);
+      // }
+      // // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
+      //
+      // newEditedRecord.push({
+      //   key: newKey,
+      //   type: `[Object Value Update]: create new value`,
+      // });
+      //
+      // object[index].push(newEditedRecord);
 
-      newEditedRecord.push({
+      const data = {
         key: newKey,
         type: `[Object Value Update]: create new value`,
-      });
+      };
 
-      object[index].push(newEditedRecord);
+      editedRecordUpdateInArray(object[index], data);
       return;
     }
   }
@@ -244,13 +314,18 @@ export function adjustValueObject(object, flag, item, type) {
       return;
     }
   }
-  while (flag.length > 1) {
-    let index = flag.shift();
-    index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
-    object = object[index];
-  }
-  let index = flag.shift();
-  index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
+  // while (flag.length > 1) {
+  //   let index = flag.shift();
+  //   index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
+  //   object = object[index];
+  // }
+  // let index = flag.shift();
+  // index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
+
+  const flagDataAndLastKey = getFlagDataAndLastKey(object, flag);
+  const index = flagDataAndLastKey.lastKey;
+  object = flagDataAndLastKey.obj;
+
   const objectType = Array.isArray(object[index]) ? 'Array' : 'Object';
   // object[index]['__edited_record'] = object[index]['__edited_record'] || [];
   console.log('adjustValueObject');
@@ -312,25 +387,32 @@ export function adjustValueObject(object, flag, item, type) {
       // try{
       object[index]['__edited_record'] = newEditedRecord;
     } else {
-      let newEditedRecord = object[index].filter(item => {
-        if (item[0] === '__edited_record') {
-          return true;
-        }
-      });
-      if (newEditedRecord.length === 0) {
-        newEditedRecord = ['__edited_record'];
-      } else {
-        newEditedRecord = newEditedRecord[0];
-        const indexNumber = object[index].indexOf(newEditedRecord);
-        object[index].splice(indexNumber, 1);
-      }
-      // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
+      // let newEditedRecord = object[index].filter(item => {
+      //   if (item[0] === '__edited_record') {
+      //     return true;
+      //   }
+      // });
+      // if (newEditedRecord.length === 0) {
+      //   newEditedRecord = ['__edited_record'];
+      // } else {
+      //   newEditedRecord = newEditedRecord[0];
+      //   const indexNumber = object[index].indexOf(newEditedRecord);
+      //   object[index].splice(indexNumber, 1);
+      // }
+      // // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
+      //
+      // newEditedRecord.push({
+      //   key: item,
+      //   type,
+      // });
+      // object[index].push(newEditedRecord);
 
-      newEditedRecord.push({
+      const data = {
         key: item,
         type,
-      });
-      object[index].push(newEditedRecord);
+      };
+
+      editedRecordUpdateInArray(object[index], data);
     }
   }
 }
@@ -361,13 +443,19 @@ export function updateKeyObject(object, newKey, flag, item) {
     delete object[item];
     return;
   }
-  while (flag.length > 1) {
-    let index = flag.shift();
-    index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
-    object = object[index];
-  }
-  let index = flag.shift();
-  index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
+
+  // while (flag.length > 1) {
+  //   let index = flag.shift();
+  //   index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
+  //   object = object[index];
+  // }
+  // let index = flag.shift();
+  // index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
+
+  const flagDataAndLastKey = getFlagDataAndLastKey(object, flag);
+  const index = flagDataAndLastKey.lastKey;
+  object = flagDataAndLastKey.obj;
+
   console.log('object[index][newKey] = object[index][item];', object[index], object[index][newKey], object[index][item])
   object[index][newKey] = object[index][item];
 
