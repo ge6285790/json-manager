@@ -35,7 +35,6 @@ const crud = {
 export default function (state = {}, action) {
   switch (action.type) {
     case types.CRUD_STATE_UPDATE:
-    console.log('1',action.data);
       return action.data;
     case types.CRUD_URL_UPDATE:
       return update(state, {

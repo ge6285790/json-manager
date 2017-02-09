@@ -10,6 +10,8 @@ import StringBlock from './stringBlock/StringBlock';
 import * as actions from '../actions/actions';
 import * as actionsCrud from '../actions/actions_crud';
 import * as actionsMode from '../actions/actions_mode';
+import jmgrHelper from '../helper/jmgr_helper';
+import * as editHelper from '../helper/edit_helper';
 
 
 console.error = (() => {
@@ -22,400 +24,400 @@ console.error = (() => {
   };
 })();
 
-function guid() {
-  function s4() {
-    return Math.floor((1 + Math.random()) * 0x100)
-      .toString(16)
-      .substring(1);
-  }
-  return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
-}
+// function guid() {
+//   function s4() {
+//     return Math.floor((1 + Math.random()) * 0x100)
+//       .toString(16)
+//       .substring(1);
+//   }
+//   return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
+// }
 
-function updateObject(object, newValue, flag) {
-  while (flag.length > 1) {
-    let index = flag.shift();
-    index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
-    object = object[index];
-  }
-  let index = flag.shift();
-  index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
-  const oldValue = Object.assign(object[index], {});
-  // const oldValue = { ...object[index] };
-  if (object[index] === newValue) {
-    return;
-  }
-  object[index] = newValue;
-  console.log('object type', object)
+// function updateObject(object, newValue, flag) {
+//   while (flag.length > 1) {
+//     let index = flag.shift();
+//     index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
+//     object = object[index];
+//   }
+//   let index = flag.shift();
+//   index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
+//   const oldValue = Object.assign(object[index], {});
+//   // const oldValue = { ...object[index] };
+//   if (object[index] === newValue) {
+//     return;
+//   }
+//   object[index] = newValue;
+//   console.log('object type', object)
+//
+//
+//   //--------
+//   if (Array.isArray(object)) {
+//     let newEditedRecord = object.filter(item => {
+//       if (item[0] === '__edited_record') {
+//         return true;
+//       }
+//     });
+//     if (newEditedRecord.length === 0) {
+//       newEditedRecord = ['__edited_record']
+//     } else {
+//       newEditedRecord = newEditedRecord[0];
+//       const indexNumber = object.indexOf(newEditedRecord);
+//       object.splice(indexNumber, 1);
+//     }
+//     // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
+//
+//     newEditedRecord.push({
+//       key: index,
+//       type: `[Object Value Update]: '${JSON.stringify(oldValue)}' convert to '${JSON.stringify(newValue)}'`,
+//     });
+//
+//     object.push(newEditedRecord);
+//     return;
+//   }
+//
+//   //-----------
+//
+//
+//   let newEditedRecord = object['__edited_record'] || [];
+//   newEditedRecord = [...newEditedRecord];
+//   newEditedRecord.push({
+//     key: index,
+//     type: `[Object Value Update]: '${JSON.stringify(oldValue)}' convert to '${JSON.stringify(newValue)}'`,
+//   });
+//   delete object['__edited_record'];
+//   // console.log('oldValue and newValue', oldValue, newValue);
+//   // try{
+//   object['__edited_record'] = newEditedRecord;
+//
+//   // object['__edited_record'] = object['__edited_record'] || [];
+//   // object['__edited_record'].push({
+//   //   key: index,
+//   //   type: `[Object Value Update]: '${JSON.stringify(oldValue)}' convert to '${JSON.stringify(newValue)}'`,
+//   // });
+// }
 
+// function addObject(object, newValue, flag) {
+//   console.log('addObject(object, newValue, flag)', object, newValue, flag)
+//   const newKey = `newKey-${guid()}`;
+//   if (flag.length === 0) {
+//     if (typeof newValue === 'object' && !Array.isArray(newValue)) {
+//       object[newKey] = { ...newValue };
+//     } else {
+//       object[newKey] = newValue;
+//     }
+//     console.log('object[index]', object);
+//     let newEditedRecord = object['__edited_record'] || [];
+//     newEditedRecord = [...newEditedRecord];
+//     newEditedRecord.push({
+//       key: newKey,
+//       type: `[Object Value Update]: create new value`,
+//     });
+//     delete object['__edited_record'];
+//     // console.log('oldValue and newValue', oldValue, newValue);
+//     // try{
+//     object['__edited_record'] = newEditedRecord;
+//     return;
+//   }
+//   while (flag.length > 1) {
+//     let index = flag.shift();
+//     index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
+//     object = object[index];
+//   }
+//   let index = flag.shift();
+//   index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
+//   // const oldValue = Object.assign(object[index], {});
+//   // const oldValue = {...object[index]};
+//   // if (object[index] === newValue) {
+//   //   return;
+//   // }
+//   // console.log("object['newValue']", object[index], object[index]['newValue'], newValue);
+//   console.log('newValue', newValue);
+//   if (typeof newValue === 'object' && !Array.isArray(newValue)) {
+//     console.log(1, object[index]);
+//     if (!Array.isArray(object[index])) {
+//       console.log(2);
+//       object[index][newKey] = {...newValue};
+//
+//       let newEditedRecord = object[index]['__edited_record'] || [];
+//       newEditedRecord = [...newEditedRecord];
+//       newEditedRecord.push({
+//         key: newKey,
+//         type: `[Object Value Update]: create new value`,
+//       });
+//       delete object[index]['__edited_record'];
+//       // console.log('oldValue and newValue', oldValue, newValue);
+//       // try{
+//       object[index]['__edited_record'] = newEditedRecord;
+//     } else {
+//       console.log(3);
+//       object[index].push({...newValue});
+//
+//       let newEditedRecord = object[index].filter(item => {
+//         if (item[0] === '__edited_record') {
+//           return true;
+//         }
+//       });
+//       console.log('newEditedRecord', newEditedRecord);
+//       if (newEditedRecord.length === 0) {
+//         newEditedRecord = ['__edited_record']
+//       } else {
+//         newEditedRecord = newEditedRecord[0];
+//         const indexNumber = object[index].indexOf(newEditedRecord);
+//         object[index].splice(indexNumber, 1);
+//       }
+//       // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
+//
+//       newEditedRecord.push({
+//         key: newKey,
+//         type: `[Object Value Update]: create new value`,
+//       });
+//
+//       object[index].push(newEditedRecord);
+//       return;
+//     }
+//   } else {
+//     console.log(1);
+//     // object[index][newKey] = newValue;
+//     if (!Array.isArray(object[index])) {
+//       object[index][newKey] = newValue;
+//       let newEditedRecord = object[index]['__edited_record'] || [];
+//       newEditedRecord = [...newEditedRecord];
+//       newEditedRecord.push({
+//         key: newKey,
+//         type: `[Object Value Update]: create new value`,
+//       });
+//       delete object[index]['__edited_record'];
+//       // console.log('oldValue and newValue', oldValue, newValue);
+//       // try{
+//       object[index]['__edited_record'] = newEditedRecord;
+//     } else {
+//       object[index].push(newValue);
+//       let newEditedRecord = object[index].filter(item => {
+//         if (item[0] === '__edited_record') {
+//           return true;
+//         }
+//       });
+//       if (newEditedRecord.length === 0) {
+//         newEditedRecord = ['__edited_record']
+//       } else {
+//         newEditedRecord = newEditedRecord[0];
+//         const indexNumber = object[index].indexOf(newEditedRecord);
+//         object[index].splice(indexNumber, 1);
+//       }
+//       // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
+//
+//       newEditedRecord.push({
+//         key: newKey,
+//         type: `[Object Value Update]: create new value`,
+//       });
+//
+//       object[index].push(newEditedRecord);
+//       return;
+//     }
+//   }
+//   console.log('object[index]', object[index]);
+//   // object[index]['__edited_record'] = object[index]['__edited_record'] || [];
+//   // // console.log('oldValue and newValue', oldValue, newValue);
+//   // // try{
+//   //   object[index]['__edited_record'].push({
+//   //     key: newKey,
+//   //     type: `[Object Value Update]: create new value`,
+//   //   });
+//   // // }catch(e){
+//   // //   // object['__edited_record'].push({
+//   // //   //   key: newKey,
+//   // //   //   type: `[Object Value Update]: create '${newValue}' and clone '${flag}' to it`,
+//   // //   // });
+//   // // }
+//
+//   // let newEditedRecord = object[index]['__edited_record'] || [];
+//   // newEditedRecord = [...newEditedRecord];
+//   // newEditedRecord.push({
+//   //   key: newKey,
+//   //   type: `[Object Value Update]: create new value`,
+//   // });
+//   // delete object[index]['__edited_record'];
+//   // // console.log('oldValue and newValue', oldValue, newValue);
+//   // // try{
+//   // object[index]['__edited_record'] = newEditedRecord;
+// }
 
-  //--------
-  if (Array.isArray(object)) {
-    let newEditedRecord = object.filter(item => {
-      if (item[0] === '__edited_record') {
-        return true;
-      }
-    });
-    if (newEditedRecord.length === 0) {
-      newEditedRecord = ['__edited_record']
-    } else {
-      newEditedRecord = newEditedRecord[0];
-      const indexNumber = object.indexOf(newEditedRecord);
-      object.splice(indexNumber, 1);
-    }
-    // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
+// function adjustValueObject(object, flag, item, type) {
+//   console.log('adjustValueObject', object, flag, item, type);
+//   if (flag.length === 0) {
+//     object['__edited_record'] = object['__edited_record'] || [];
+//     if (type === 'recover remove') {
+//       object['__edited_record'] = object['__edited_record'].map(i => {
+//         console.log('item', i, item);
+//         if (i.key === item) {
+//           i.type = 'recover remove';
+//         }
+//         return i;
+//       });
+//       return;
+//     } else {
+//       let newEditedRecord = object['__edited_record'] || [];
+//       newEditedRecord = [...newEditedRecord];
+//       newEditedRecord.push({
+//         key: item,
+//         type,
+//       });
+//       delete object['__edited_record'];
+//       // console.log('oldValue and newValue', oldValue, newValue);
+//       // try{
+//       object['__edited_record'] = newEditedRecord;
+//       // object['__edited_record'].push({
+//       //   key: item,
+//       //   type,
+//       // });
+//       return;
+//     }
+//   }
+//   while (flag.length > 1) {
+//     let index = flag.shift();
+//     index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
+//     object = object[index];
+//   }
+//   let index = flag.shift();
+//   index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
+//   const objectType = Array.isArray(object[index]) ? 'Array' : 'Object';
+//   // object[index]['__edited_record'] = object[index]['__edited_record'] || [];
+//   console.log('adjustValueObject');
+//   if (type === 'recover remove') {
+//     if (objectType === 'Object') {
+//       object[index]['__edited_record'] = object[index]['__edited_record'] || [];
+//       object[index]['__edited_record'] = object[index]['__edited_record'].map(i => {
+//         console.log('item', i, item);
+//         if (i.key === item) {
+//           i.type = 'recover remove';
+//         }
+//         return i;
+//       });
+//     } else{
+//       let newEditedRecord = object[index].filter(item => {
+//         if (item[0] === '__edited_record') {
+//           return true;
+//         }
+//       });
+//       if (newEditedRecord.length === 0) {
+//         newEditedRecord = ['__edited_record', {
+//           key: item,
+//           type: 'recover remove',
+//         }];
+//       } else {
+//         newEditedRecord = newEditedRecord[0];
+//         const indexNumber = object[index].indexOf(newEditedRecord);
+//         object[index].splice(indexNumber, 1);
+//       }
+//       // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
+//
+//       // newEditedRecord.push({
+//       //   key: newKey,
+//       //   type: `[Object Value Update]: create new value`,
+//       // });
+//       newEditedRecord.map(child => {
+//         if (child.key === item) {
+//           child.type = 'recover remove';
+//         }
+//         return child;
+//       })
+//
+//       object[index].push(newEditedRecord);
+//     }
+//   } else {
+//     // object[index]['__edited_record'].push({
+//     //   key: item,
+//     //   type,
+//     // });
+//     if (objectType === 'Object') {
+//       let newEditedRecord = object[index]['__edited_record'] || [];
+//       newEditedRecord = [...newEditedRecord];
+//       newEditedRecord.push({
+//         key: item,
+//         type,
+//       });
+//       delete object[index]['__edited_record'];
+//       // console.log('oldValue and newValue', oldValue, newValue);
+//       // try{
+//       object[index]['__edited_record'] = newEditedRecord;
+//     } else {
+//       let newEditedRecord = object[index].filter(item => {
+//         if (item[0] === '__edited_record') {
+//           return true;
+//         }
+//       });
+//       if (newEditedRecord.length === 0) {
+//         newEditedRecord = ['__edited_record'];
+//       } else {
+//         newEditedRecord = newEditedRecord[0];
+//         const indexNumber = object[index].indexOf(newEditedRecord);
+//         object[index].splice(indexNumber, 1);
+//       }
+//       // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
+//
+//       newEditedRecord.push({
+//         key: item,
+//         type,
+//       });
+//       object[index].push(newEditedRecord);
+//     }
+//   }
+// }
 
-    newEditedRecord.push({
-      key: index,
-      type: `[Object Value Update]: '${JSON.stringify(oldValue)}' convert to '${JSON.stringify(newValue)}'`,
-    });
-
-    object.push(newEditedRecord);
-    return;
-  }
-
-  //-----------
-
-
-  let newEditedRecord = object['__edited_record'] || [];
-  newEditedRecord = [...newEditedRecord];
-  newEditedRecord.push({
-    key: index,
-    type: `[Object Value Update]: '${JSON.stringify(oldValue)}' convert to '${JSON.stringify(newValue)}'`,
-  });
-  delete object['__edited_record'];
-  // console.log('oldValue and newValue', oldValue, newValue);
-  // try{
-  object['__edited_record'] = newEditedRecord;
-
-  // object['__edited_record'] = object['__edited_record'] || [];
-  // object['__edited_record'].push({
-  //   key: index,
-  //   type: `[Object Value Update]: '${JSON.stringify(oldValue)}' convert to '${JSON.stringify(newValue)}'`,
-  // });
-}
-
-function addObject(object, newValue, flag) {
-  console.log('addObject(object, newValue, flag)', object, newValue, flag)
-  const newKey = `newKey-${guid()}`;
-  if (flag.length === 0) {
-    if (typeof newValue === 'object' && !Array.isArray(newValue)) {
-      object[newKey] = { ...newValue };
-    } else {
-      object[newKey] = newValue;
-    }
-    console.log('object[index]', object);
-    let newEditedRecord = object['__edited_record'] || [];
-    newEditedRecord = [...newEditedRecord];
-    newEditedRecord.push({
-      key: newKey,
-      type: `[Object Value Update]: create new value`,
-    });
-    delete object['__edited_record'];
-    // console.log('oldValue and newValue', oldValue, newValue);
-    // try{
-    object['__edited_record'] = newEditedRecord;
-    return;
-  }
-  while (flag.length > 1) {
-    let index = flag.shift();
-    index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
-    object = object[index];
-  }
-  let index = flag.shift();
-  index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
-  // const oldValue = Object.assign(object[index], {});
-  // const oldValue = {...object[index]};
-  // if (object[index] === newValue) {
-  //   return;
-  // }
-  // console.log("object['newValue']", object[index], object[index]['newValue'], newValue);
-  console.log('newValue', newValue);
-  if (typeof newValue === 'object' && !Array.isArray(newValue)) {
-    console.log(1, object[index]);
-    if (!Array.isArray(object[index])) {
-      console.log(2);
-      object[index][newKey] = {...newValue};
-
-      let newEditedRecord = object[index]['__edited_record'] || [];
-      newEditedRecord = [...newEditedRecord];
-      newEditedRecord.push({
-        key: newKey,
-        type: `[Object Value Update]: create new value`,
-      });
-      delete object[index]['__edited_record'];
-      // console.log('oldValue and newValue', oldValue, newValue);
-      // try{
-      object[index]['__edited_record'] = newEditedRecord;
-    } else {
-      console.log(3);
-      object[index].push({...newValue});
-
-      let newEditedRecord = object[index].filter(item => {
-        if (item[0] === '__edited_record') {
-          return true;
-        }
-      });
-      console.log('newEditedRecord', newEditedRecord);
-      if (newEditedRecord.length === 0) {
-        newEditedRecord = ['__edited_record']
-      } else {
-        newEditedRecord = newEditedRecord[0];
-        const indexNumber = object[index].indexOf(newEditedRecord);
-        object[index].splice(indexNumber, 1);
-      }
-      // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
-
-      newEditedRecord.push({
-        key: newKey,
-        type: `[Object Value Update]: create new value`,
-      });
-
-      object[index].push(newEditedRecord);
-      return;
-    }
-  } else {
-    console.log(1);
-    // object[index][newKey] = newValue;
-    if (!Array.isArray(object[index])) {
-      object[index][newKey] = newValue;
-      let newEditedRecord = object[index]['__edited_record'] || [];
-      newEditedRecord = [...newEditedRecord];
-      newEditedRecord.push({
-        key: newKey,
-        type: `[Object Value Update]: create new value`,
-      });
-      delete object[index]['__edited_record'];
-      // console.log('oldValue and newValue', oldValue, newValue);
-      // try{
-      object[index]['__edited_record'] = newEditedRecord;
-    } else {
-      object[index].push(newValue);
-      let newEditedRecord = object[index].filter(item => {
-        if (item[0] === '__edited_record') {
-          return true;
-        }
-      });
-      if (newEditedRecord.length === 0) {
-        newEditedRecord = ['__edited_record']
-      } else {
-        newEditedRecord = newEditedRecord[0];
-        const indexNumber = object[index].indexOf(newEditedRecord);
-        object[index].splice(indexNumber, 1);
-      }
-      // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
-
-      newEditedRecord.push({
-        key: newKey,
-        type: `[Object Value Update]: create new value`,
-      });
-
-      object[index].push(newEditedRecord);
-      return;
-    }
-  }
-  console.log('object[index]', object[index]);
-  // object[index]['__edited_record'] = object[index]['__edited_record'] || [];
-  // // console.log('oldValue and newValue', oldValue, newValue);
-  // // try{
-  //   object[index]['__edited_record'].push({
-  //     key: newKey,
-  //     type: `[Object Value Update]: create new value`,
-  //   });
-  // // }catch(e){
-  // //   // object['__edited_record'].push({
-  // //   //   key: newKey,
-  // //   //   type: `[Object Value Update]: create '${newValue}' and clone '${flag}' to it`,
-  // //   // });
-  // // }
-
-  // let newEditedRecord = object[index]['__edited_record'] || [];
-  // newEditedRecord = [...newEditedRecord];
-  // newEditedRecord.push({
-  //   key: newKey,
-  //   type: `[Object Value Update]: create new value`,
-  // });
-  // delete object[index]['__edited_record'];
-  // // console.log('oldValue and newValue', oldValue, newValue);
-  // // try{
-  // object[index]['__edited_record'] = newEditedRecord;
-}
-
-function adjustValueObject(object, flag, item, type) {
-  console.log('adjustValueObject', object, flag, item, type);
-  if (flag.length === 0) {
-    object['__edited_record'] = object['__edited_record'] || [];
-    if (type === 'recover remove') {
-      object['__edited_record'] = object['__edited_record'].map(i => {
-        console.log('item', i, item);
-        if (i.key === item) {
-          i.type = 'recover remove';
-        }
-        return i;
-      });
-      return;
-    } else {
-      let newEditedRecord = object['__edited_record'] || [];
-      newEditedRecord = [...newEditedRecord];
-      newEditedRecord.push({
-        key: item,
-        type,
-      });
-      delete object['__edited_record'];
-      // console.log('oldValue and newValue', oldValue, newValue);
-      // try{
-      object['__edited_record'] = newEditedRecord;
-      // object['__edited_record'].push({
-      //   key: item,
-      //   type,
-      // });
-      return;
-    }
-  }
-  while (flag.length > 1) {
-    let index = flag.shift();
-    index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
-    object = object[index];
-  }
-  let index = flag.shift();
-  index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
-  const objectType = Array.isArray(object[index]) ? 'Array' : 'Object';
-  // object[index]['__edited_record'] = object[index]['__edited_record'] || [];
-  console.log('adjustValueObject');
-  if (type === 'recover remove') {
-    if (objectType === 'Object') {
-      object[index]['__edited_record'] = object[index]['__edited_record'] || [];
-      object[index]['__edited_record'] = object[index]['__edited_record'].map(i => {
-        console.log('item', i, item);
-        if (i.key === item) {
-          i.type = 'recover remove';
-        }
-        return i;
-      });
-    } else{
-      let newEditedRecord = object[index].filter(item => {
-        if (item[0] === '__edited_record') {
-          return true;
-        }
-      });
-      if (newEditedRecord.length === 0) {
-        newEditedRecord = ['__edited_record', {
-          key: item,
-          type: 'recover remove',
-        }];
-      } else {
-        newEditedRecord = newEditedRecord[0];
-        const indexNumber = object[index].indexOf(newEditedRecord);
-        object[index].splice(indexNumber, 1);
-      }
-      // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
-
-      // newEditedRecord.push({
-      //   key: newKey,
-      //   type: `[Object Value Update]: create new value`,
-      // });
-      newEditedRecord.map(child => {
-        if (child.key === item) {
-          child.type = 'recover remove';
-        }
-        return child;
-      })
-
-      object[index].push(newEditedRecord);
-    }
-  } else {
-    // object[index]['__edited_record'].push({
-    //   key: item,
-    //   type,
-    // });
-    if (objectType === 'Object') {
-      let newEditedRecord = object[index]['__edited_record'] || [];
-      newEditedRecord = [...newEditedRecord];
-      newEditedRecord.push({
-        key: item,
-        type,
-      });
-      delete object[index]['__edited_record'];
-      // console.log('oldValue and newValue', oldValue, newValue);
-      // try{
-      object[index]['__edited_record'] = newEditedRecord;
-    } else {
-      let newEditedRecord = object[index].filter(item => {
-        if (item[0] === '__edited_record') {
-          return true;
-        }
-      });
-      if (newEditedRecord.length === 0) {
-        newEditedRecord = ['__edited_record'];
-      } else {
-        newEditedRecord = newEditedRecord[0];
-        const indexNumber = object[index].indexOf(newEditedRecord);
-        object[index].splice(indexNumber, 1);
-      }
-      // newEditedRecord = newEditedRecord.length === 0 ? ['__edited_record'] : newEditedRecord[0];
-
-      newEditedRecord.push({
-        key: item,
-        type,
-      });
-      object[index].push(newEditedRecord);
-    }
-  }
-}
-
-function updateKeyObject(object, newKey, flag, item) {
-  if (newKey === item) {
-    return;
-  }
-  if (flag.length === 0) {
-    object[newKey] = object[item];
-
-    let newEditedRecord = object['__edited_record'] || [];
-    newEditedRecord = [...newEditedRecord];
-    newEditedRecord.push({
-      key: newKey,
-      type: `[Object Key Update]: '${item}' convert to '${newKey}'`,
-    });
-    delete object['__edited_record'];
-    // console.log('oldValue and newValue', oldValue, newValue);
-    // try{
-    object['__edited_record'] = newEditedRecord;
-
-    // object['__edited_record'] = object['__edited_record'] || [];
-    // object['__edited_record'].push({
-    //   key: newKey,
-    //   type: `[Object Key Update]: '${item}' convert to '${newKey}'`,
-    // });
-    delete object[item];
-    return;
-  }
-  while (flag.length > 1) {
-    let index = flag.shift();
-    index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
-    object = object[index];
-  }
-  let index = flag.shift();
-  index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
-  console.log('object[index][newKey] = object[index][item];', object[index], object[index][newKey], object[index][item])
-  object[index][newKey] = object[index][item];
-
-  let newEditedRecord = object[index]['__edited_record'] || [];
-  newEditedRecord = [...newEditedRecord];
-  newEditedRecord.push({
-    key: newKey,
-    type: `[Object Key Update]: '${item}' convert to '${newKey}'`,
-  });
-  delete object[index]['__edited_record'];
-  // console.log('oldValue and newValue', oldValue, newValue);
-  // try{
-  object[index]['__edited_record'] = newEditedRecord;
-
-  // object[index]['__edited_record'] = object[index]['__edited_record'] || [];
-  // object[index]['__edited_record'].push({
-  //   key: newKey,
-  //   type: `[Object Key Update]: '${item}' convert to '${newKey}'`,
-  // });
-  delete object[index][item];
-}
+// function updateKeyObject(object, newKey, flag, item) {
+//   if (newKey === item) {
+//     return;
+//   }
+//   if (flag.length === 0) {
+//     object[newKey] = object[item];
+//
+//     let newEditedRecord = object['__edited_record'] || [];
+//     newEditedRecord = [...newEditedRecord];
+//     newEditedRecord.push({
+//       key: newKey,
+//       type: `[Object Key Update]: '${item}' convert to '${newKey}'`,
+//     });
+//     delete object['__edited_record'];
+//     // console.log('oldValue and newValue', oldValue, newValue);
+//     // try{
+//     object['__edited_record'] = newEditedRecord;
+//
+//     // object['__edited_record'] = object['__edited_record'] || [];
+//     // object['__edited_record'].push({
+//     //   key: newKey,
+//     //   type: `[Object Key Update]: '${item}' convert to '${newKey}'`,
+//     // });
+//     delete object[item];
+//     return;
+//   }
+//   while (flag.length > 1) {
+//     let index = flag.shift();
+//     index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
+//     object = object[index];
+//   }
+//   let index = flag.shift();
+//   index = isNaN(parseInt(index, 10)) ? index : parseInt(index, 10);
+//   console.log('object[index][newKey] = object[index][item];', object[index], object[index][newKey], object[index][item])
+//   object[index][newKey] = object[index][item];
+//
+//   let newEditedRecord = object[index]['__edited_record'] || [];
+//   newEditedRecord = [...newEditedRecord];
+//   newEditedRecord.push({
+//     key: newKey,
+//     type: `[Object Key Update]: '${item}' convert to '${newKey}'`,
+//   });
+//   delete object[index]['__edited_record'];
+//   // console.log('oldValue and newValue', oldValue, newValue);
+//   // try{
+//   object[index]['__edited_record'] = newEditedRecord;
+//
+//   // object[index]['__edited_record'] = object[index]['__edited_record'] || [];
+//   // object[index]['__edited_record'].push({
+//   //   key: newKey,
+//   //   type: `[Object Key Update]: '${item}' convert to '${newKey}'`,
+//   // });
+//   delete object[index][item];
+// }
 
 function mapStateToProps(state) {
   console.log('state', state)
@@ -439,7 +441,23 @@ function mapDispatchToProps(dispatch) {
 class Main extends Component {
   constructor(props) {
     super(props);
-    console.log('props', props);
+    const { option, updateScope, modeOption, jmgr, actions: act } = props;
+    let { crud } = props;
+    // jsonDataEditTempRemove: this.jsonDataEditTempRemove,
+    if (!('read' in crud)) {
+      crud = jmgr.data.crud;
+      act.actionsCrud.crudStateUpdate(crud);
+    }
+    this.state = {
+      modeOption,
+      updateScope,
+      editScope: option.editScope,
+      data: option.defaultData || {},
+      crud,
+      // sendApi: {
+      //   type: 'update',
+      // }
+    };
     this.renderChild = this.renderChild.bind(this);
     this.jsonDataUPDATE = this.jsonDataUPDATE.bind(this);
     this.jsonDataTempAdd = this.jsonDataTempAdd.bind(this);
@@ -447,117 +465,24 @@ class Main extends Component {
     this.jsonDataREMOVE = this.jsonDataREMOVE.bind(this);
     this.onDrop = this.onDrop.bind(this);
     this.addSubValueType = 'String';
-    // jsonDataEditTempRemove: this.jsonDataEditTempRemove,
-    const { option, crud, updateScope, modeOption } = props;
-    this.state = {
-      modeOption,
-      updateScope,
-      editScope: option.editScope,
-      data: option.defaultData || {},
-      crud,
-      getJson: {
-        visible: 'false',
-        type: 'api',
-      },
-      // sendApi: {
-      //   type: 'update',
-      // }
-    };
   }
 
   componentDidMount() {
-    const { jmgr } = this.props;
+    const { jmgr, actions: act } = this.props;
     const that = this;
-    this.apiGET();
-
-    jmgr.style = () => {
-      console.log('style');
-    };
-
-    jmgr.mode = {
-      // importMode => show import modal or not
-      // visible is boolean string,
-      // 'true' => show import modal,
-      // 'false' => hide import modal
-      importMode: (visible) => {
-        const boolean = visible || (document.querySelector('.import-json-modal').dataset.active === 'false' ? 'true' : 'false');
-        that.modeImportModalUpdate('visible', boolean);
-      },
-
-      editMode: () => {
-        that.modeTypeUpdate('edit');
-      },
-
-      sendMode: () => {
-        that.modeTypeUpdate('send');
-      },
-    }
-
-    jmgr.crud = {
-      create: () => {
-        console.log('create');
-      },
-
-      read: () => {
-        console.log('read');
-      },
-
-      update: () => {
-        console.log('update');
-      },
-
-      delete: () => {
-        console.log('delete');
-      },
-    };
-
-    jmgr.modeChange = () => {
-      console.log('modeChange');
-    };
-
-    jmgr.importJSON = () => {
-      console.log('import');
-    };
-
-    jmgr.exportJSON = () => {
-      console.log('export');
-    };
-
-    jmgr.edit = {
-      flagSelect: () => {
-        console.log('flagSelect');
-      },
-
-      typeChange: () => {
-        console.log('typeChange');
-      },
-
-      create: () => {
-        console.log('create');
-      },
-
-      remove: () => {
-        console.log('remove');
-      },
-
-      recover: () => {
-        console.log('recover');
-      },
-    };
+    this.callReadApi();
+    jmgrHelper(jmgr, act, that);
   }
 
   componentWillReceiveProps(nextProps) {
     const { option, crud, updateScope, modeOption } = nextProps;
+    console.log('componentWillReceiveProps', crud);
     this.state = {
       modeOption,
       updateScope,
       editScope: option.editScope,
       data: option.defaultData || {},
       crud,
-      getJson: {
-        visible: 'false',
-        type: 'api',
-      },
       // sendApi: {
       //   type: 'update',
       // }
@@ -575,8 +500,9 @@ class Main extends Component {
   }
 
 
-  apiGET() {
-    const { actions: act, crud } = this.props;
+  callReadApi() {
+    const { actions: act } = this.props;
+    const { crud } = this.state;
     const { url, refernceFlag, type, data } = crud.read;
     if (url === '') {
       return;
@@ -588,156 +514,53 @@ class Main extends Component {
           if (err || res.status !== 200) {
             // console.log(new Error(err));
             act.actionsCrud.crudResponseUPDATE((err).toString());
-          } else {
-            if (refernceFlag === '') {
-              act.jsonDataAction.apiGET(res.body);
-              act.actionsCrud.crudResponseUPDATE('');
-              this.modeImportModalUpdate('visible', 'false');
-              return;
-            }
-
-            const arrayFlags = refernceFlag.split('>');
-            let result = res.body;
-
-            for (const item of arrayFlags) {
-              result = result[item];
-            }
-            act.jsonDataAction.apiGET(result);
+            return;
+          }
+          if (refernceFlag === '') {
+            act.jsonDataAction.callReadApi(res.body);
             act.actionsCrud.crudResponseUPDATE('');
             this.modeImportModalUpdate('visible', 'false');
+            return;
           }
-        });
-    } else {
-      request.post(url)
-        .set('Accept', 'application/json')
-        .send(data)
-        .end((err, res) => {
-          if (err || res.status !== 200) {
-            // console.log(new Error(err));
-            act.actionsCrud.crudResponseUPDATE((err).toString());
-          } else {
-            if (refernceFlag === '') {
-              act.jsonDataAction.apiGET(res.body);
-              act.actionsCrud.crudResponseUPDATE('');
-              this.modeImportModalUpdate('visible', 'false');
-              return;
-            }
 
-            const arrayFlags = refernceFlag.split('>');
-            let result = res.body;
+          const arrayFlags = refernceFlag.split('>');
+          let result = res.body;
 
-            for (const item of arrayFlags) {
-              result = result[item];
-            }
-            act.jsonDataAction.apiGET(result);
-            act.actionsCrud.crudResponseUPDATE('');
-            this.modeImportModalUpdate('visible', 'false');
+          for (const item of arrayFlags) {
+            result = result[item];
           }
+          act.jsonDataAction.callReadApi(result);
+          act.actionsCrud.crudResponseUPDATE('');
+          this.modeImportModalUpdate('visible', 'false');
         });
+      return;
     }
-    // fetch(url, { method: type, data })
-    //   .then(response => response.json())
-    //   .then((jsonData) => {
-    //
-    //     if (refernceFlag === '') {
-    //       actions.jsonDataAction.jsonDataGET(jsonData);
-    //       return;
-    //     }
-    //
-    //     const arrayFlags = refernceFlag.split('>');
-    //     let result = jsonData;
-    //
-    //     for (const item of arrayFlags) {
-    //       result = result[item];
-    //     }
-    //     actions.jsonDataAction.jsonDataGET(result);
-    //   });
-  }
+    request.post(url)
+      .set('Accept', 'application/json')
+      .send(data)
+      .end((err, res) => {
+        if (err || res.status !== 200) {
+          // console.log(new Error(err));
+          act.actionsCrud.crudResponseUPDATE((err).toString());
+          return;
+        }
+        if (refernceFlag === '') {
+          act.jsonDataAction.callReadApi(res.body);
+          act.actionsCrud.crudResponseUPDATE('');
+          this.modeImportModalUpdate('visible', 'false');
+          return;
+        }
 
-  jsonDataUPDATE1(value, flags) {
-    // url: 'cc',
-    // type: 'POST',
-    // refernceFlag: 'title',
-    // id: 'month1', // default '';
-    const { crud } = this.props;
-    const { refernceFlag } = crud.update;
-    const flagArray = flags.split('>');
-    const refernceFlagArray = refernceFlag.split('>');
-    const updateFlagArray = refernceFlagArray.map((item, i) => {
-      // if (item === 'arrayIndex') {
-      //   return flagArray[i]
-      // }
-      // if (item === flagArray[i] || (item === 'arrayIndex' && parseInt(flagArray[i]) !== NaN)) {
-      //   return flagArray[i];
-      // }
-      if (item === 'arrayIndex' && !isNaN(parseInt(flagArray[i], 10))) {
-        return flagArray[i];
-      }
-      return item;
-    });
-    console.log('updateFlagArray', updateFlagArray);
-    // const data = new FormData();
-    // data.append('json', JSON.stringify(updateData));
+        const arrayFlags = refernceFlag.split('>');
+        let result = res.body;
 
-    //-------
-    // request.post(url)
-    //   // .set('Hashcash', hashCash)
-    //   .set('Accept', 'application/json')
-    //   // .set('Authorization', 'Bearer ' + isuntvCheck.token)
-    //   .send(value)
-    //   .end((err, res) => {
-    //     if (err || res.status !== 200) {
-    //       alert('失敗');
-    //       console.log(new Error(err));
-    //     } else {
-    //       this.jsonDataGET();
-    //     }
-    //   });
-    //-------
-
-    // request.get(url)
-    //   .set('Accept', 'application/json')
-    //   .end((err, res) => {
-    //     if (err || res.status !== 200) {
-    //       console.log(new Error(err));
-    //     } else {
-    //       if (refernceFlag === '') {
-    //         actions.jsonDataAction.jsonDataGET(res.body);
-    //         return;
-    //       }
-    //
-    //       const arrayFlags = refernceFlag.split('>');
-    //       let result = res.body;
-    //
-    //       for (const item of arrayFlags) {
-    //         result = result[item];
-    //       }
-    //       actions.jsonDataAction.jsonDataGET(result);
-    //     }
-    //   });
-
-    // fetch(url, { method: type, body: data })
-    //   .then((response) => {
-    //     if (response.ok) {
-    //       return response.blob();
-    //     }
-    //   });
-      // .then((jsonData) => {
-      //
-      //   if (refernceFlag === '') {
-      //     actions.jsonDataAction.jsonDataGET(jsonData);
-      //     return;
-      //   }
-      //
-      //   const arrayFlags = refernceFlag.split('>');
-      //   let result = jsonData;
-      //
-      //   for (const item of arrayFlags) {
-      //     result = result[item];
-      //   }
-      //   actions.jsonDataAction.jsonDataGET(result);
-      //
-      // });
+        for (const item of arrayFlags) {
+          result = result[item];
+        }
+        act.jsonDataAction.callReadApi(result);
+        act.actionsCrud.crudResponseUPDATE('');
+        this.modeImportModalUpdate('visible', 'false');
+      });
   }
 
   jsonDataUPDATE(text, refernceFlag) {
@@ -747,17 +570,11 @@ class Main extends Component {
     } else {
       parseText = parseInt(text, 10);
     }
+    const newState = { ...this.state.data };
     const { actions: act } = this.props;
     const refernceFlagArray = refernceFlag.split('>');
     refernceFlagArray.shift();
-
-    // const newState = Object.assign(this.state.data, {});
-    const newState = { ...this.state.data };
-
-
-    updateObject(newState, parseText, refernceFlagArray);
-
-
+    editHelper.updateObject(newState, parseText, refernceFlagArray);
     act.jsonDataAction.jsonDataUPDATE(newState);
   }
 
@@ -766,7 +583,7 @@ class Main extends Component {
     const { actions: act } = this.props;
     // const newState = Object.assign(this.state.data, {});
     const newState = { ...this.state.data };
-    adjustValueObject(newState, refernceFlagArray, item, 'remove');
+    editHelper.adjustValueObject(newState, refernceFlagArray, item, 'remove');
     act.jsonDataAction.jsonDataUPDATE(newState);
   }
 
@@ -775,7 +592,7 @@ class Main extends Component {
     const { actions: act } = this.props;
     // const newState = Object.assign(this.state.data, {});
     const newState = { ...this.state.data };
-    adjustValueObject(newState, refernceFlagArray, item, 'recover remove');
+    editHelper.adjustValueObject(newState, refernceFlagArray, item, 'recover remove');
     act.jsonDataAction.jsonDataUPDATE(newState);
   }
 
@@ -789,7 +606,7 @@ class Main extends Component {
     const newState = { ...this.state.data };
 
 
-    updateKeyObject(newState, text, refernceFlagArray, item);
+    editHelper.updateKeyObject(newState, text, refernceFlagArray, item);
     console.log('newState', newState);
 
 
@@ -875,7 +692,7 @@ class Main extends Component {
         break;
     }
 
-    addObject(newState, newValue, refernceFlagArray);
+    editHelper.addObject(newState, newValue, refernceFlagArray);
 
     console.log('addObject newState', newState);
     act.jsonDataAction.jsonDataUPDATE(newState);
@@ -967,7 +784,7 @@ class Main extends Component {
     const newState = { ...this.state.data };
 
 
-    updateObject(newState, newValue, refernceFlagArray);
+    editHelper.updateObject(newState, newValue, refernceFlagArray);
 
     act.jsonDataAction.jsonDataUPDATE(newState);
   }
@@ -1087,7 +904,7 @@ class Main extends Component {
     reader.onload = (e) => {
       // console.log(e.target.result);
       this.modeImportModalUpdate('visible', 'false');
-      act.jsonDataAction.apiGET(JSON.parse(e.target.result));
+      act.jsonDataAction.callReadApi(JSON.parse(e.target.result));
     };
     // console.log('acceptedFiles[0].preview', acceptedFiles[0].preview);
     reader.readAsBinaryString(acceptedFiles[0]);
@@ -1481,12 +1298,10 @@ class Main extends Component {
   }
 
   render() {
-    const { actions: act, jmgr } = this.props;
-    act.actionsCrud.crudStateUpdate(jmgr.data.crud);
+    const { actions: act } = this.props;
     const { data, updateScope, crud, modeOption, editScope } = this.state;
     const blockType = Array.isArray(data) ? 'array' : 'default';
     const { importModal, type } = modeOption;
-    console.log(jmgr);
 
     console.log('modeOption', modeOption, crud);
     // let refernceFlagInputValue = '';
@@ -1693,7 +1508,7 @@ class Main extends Component {
               </div>
               <p className="showError" data-active={crud.response === '' ? 'false' : 'true'}>*{crud.response}</p>
               <div className="api-send">
-                <div onClick={() => { this.apiGET(); }}>Send</div>
+                <div onClick={() => { this.callReadApi(); }}>Send</div>
               </div>
             </div>
             <div className="get-json-by-drop" data-active={importModal.type === 'file' ? 'true' : 'false'}>

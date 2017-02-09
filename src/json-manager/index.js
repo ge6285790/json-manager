@@ -9,6 +9,7 @@ import store from './store/store';
 
 function Jmgr(option) {
   const { defaultData, crud, elementId } = option;
+  crud.response = '';
   this.data = {
     defaultData,
     crud,

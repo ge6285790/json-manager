@@ -36,7 +36,7 @@ const option = {
 
 export default function (state = option, action) {
   switch (action.type) {
-    case types.API_GET:
+    case types.CALL_READ_API:
       return update(state, {
         defaultData: { $set: action.data },
       });

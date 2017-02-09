@@ -15,9 +15,9 @@ import * as types from '../constants/actionTypes';
 //   };
 // }
 
-export function apiGET(data) {
+export function callReadApi(data) {
   return {
-    type: types.API_GET,
+    type: types.CALL_READ_API,
     data,
   };
 }
