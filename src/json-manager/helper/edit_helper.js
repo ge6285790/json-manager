@@ -114,92 +114,32 @@ export function updateObject(object, newValue, flag) {
   editedRecordUpdateInObject(obj, data);
 }
 
-// export function addObject(object, newValue, flag) {
-//   console.log('addObject(object, newValue, flag)', object, newValue, flag);
-//   let obj = object;
-//   const newKey = `newKey-${guid()}`;
-//   if (flag.length === 0) {
-//     if (typeof newValue === 'object' && !Array.isArray(newValue)) {
-//       obj[newKey] = { ...newValue };
-//     } else {
-//       obj[newKey] = newValue;
-//     }
-//     console.log('object[index]', obj);
-//
-//     const data = {
-//       key: newKey,
-//       type: '[Object Value Update]: create new value',
-//     };
-//
-//     editedRecordUpdateInObject(obj, data);
-//     return;
-//   }
-//
-//   const flagDataAndLastKey = getFlagDataAndLastKey(obj, flag);
-//   const index = flagDataAndLastKey.lastKey;
-//   obj = flagDataAndLastKey.obj;
-//
-//   console.log('newValue', newValue);
-//   if (typeof newValue === 'object' && !Array.isArray(newValue)) {
-//     console.log(1, obj[index]);
-//     if (!Array.isArray(obj[index])) {
-//       console.log(2);
-//       obj[index][newKey] = { ...newValue };
-//
-//       const data = {
-//         key: newKey,
-//         type: '[Object Value Update]: create new value',
-//       };
-//
-//       editedRecordUpdateInObject(obj[index], data);
-//     } else {
-//       console.log(3);
-//       obj[index].push({ ...newValue });
-//
-//       const data = {
-//         key: newKey,
-//         type: '[Object Value Update]: create new value',
-//       };
-//
-//       editedRecordUpdateInArray(obj[index], data);
-//       return;
-//     }
-//   } else {
-//     console.log(1);
-//     // object[index][newKey] = newValue;
-//     if (!Array.isArray(obj[index])) {
-//       obj[index][newKey] = newValue;
-//
-//       const data = {
-//         key: newKey,
-//         type: '[Object Value Update]: create new value',
-//       };
-//
-//       editedRecordUpdateInObject(obj[index], data);
-//     } else {
-//       obj[index].push(newValue);
-//
-//       const data = {
-//         key: newKey,
-//         type: '[Object Value Update]: create new value',
-//       };
-//
-//       editedRecordUpdateInArray(obj[index], data);
-//       return;
-//     }
-//   }
-//   console.log('object[index]', obj[index]);
-// }
-
 export function addObject(object, newValue, flag) {
   console.log('addObject(object, newValue, flag)', object, newValue, flag);
   let obj = object;
   const newKey = `newKey-${guid()}`;
 
-  const newValueType = (typeof newValue === 'object' && !Array.isArray(newValue)) ? 'object' : 'array';
   let flagType;
   let flagDataAndLastKey;
   let index;
+  let newValueType;
+  const data = {
+    key: newKey,
+  };
+
+  if (typeof newValue === 'object' && !Array.isArray(newValue)) {
+    newValueType = 'object';
+    data.type = '[Value Update]: create new object';
+  } else if (typeof newValue === 'object' && Array.isArray(newValue)) {
+    newValueType = 'array';
+    data.type = '[Value Update]: create new array';
+  } else if (typeof newValue === 'string') {
+    newValueType = 'string';
+    data.type = '[Value Update]: create new string';
+  } else {
+    newValueType = typeof newValue;
+    data.type = `[Value Update]: create new ${newValueType}`;
+  }
 
   if (flag.length === 0) {
     flagType = 'root';
@@ -207,7 +147,7 @@ export function addObject(object, newValue, flag) {
     flagDataAndLastKey = getFlagDataAndLastKey(obj, flag);
     index = flagDataAndLastKey.lastKey;
     obj = flagDataAndLastKey.obj;
-    console.log('obj-----', flagDataAndLastKey, typeof obj === 'object', !Array.isArray(obj))
+    console.log('obj-----', flagDataAndLastKey, typeof obj === 'object', !Array.isArray(obj));
     flagType = (typeof obj[index] === 'object' && !Array.isArray(obj[index])) ? 'object' : 'array';
   }
 
@@ -215,204 +155,123 @@ export function addObject(object, newValue, flag) {
   switch (`${flagType}-${newValueType}`) {
     case 'root-object': {
       obj[newKey] = { ...newValue };
-      const data = {
-        key: newKey,
-        type: '[Object Value Update]: create new value',
-      };
-
       editedRecordUpdateInObject(obj, data);
       return;
     }
     case 'root-array': {
       obj[newKey] = newValue;
-      const data = {
-        key: newKey,
-        type: '[Object Value Update]: create new value',
-      };
-
+      editedRecordUpdateInObject(obj, data);
+      return;
+    }
+    case 'root-string': {
+      obj[newKey] = newValue;
       editedRecordUpdateInObject(obj, data);
       return;
     }
     case 'object-object': {
       obj[index][newKey] = { ...newValue };
-
-      const data = {
-        key: newKey,
-        type: '[Object Value Update]: create new value',
-      };
-
       editedRecordUpdateInObject(obj[index], data);
       return;
     }
     case 'object-array': {
-      // obj[index].push({ ...newValue });
-      //
-      // const data = {
-      //   key: newKey,
-      //   type: '[Object Value Update]: create new value',
-      // };
-      //
-      // editedRecordUpdateInArray(obj[index], data);
-      // return;
-      // obj[index][newKey] = { ...newValue };
       obj[index][newKey] = newValue;
-
-      const data = {
-        key: newKey,
-        type: '[Object Value Update]: create new value',
-      };
-
+      editedRecordUpdateInObject(obj[index], data);
+      return;
+    }
+    case 'object-string': {
+      obj[index][newKey] = newValue;
       editedRecordUpdateInObject(obj[index], data);
       return;
     }
     case 'array-object': {
       obj[index].push(newValue);
-
-      const data = {
-        key: newKey,
-        type: '[Object Value Update]: create new value',
-      };
-
       editedRecordUpdateInArray(obj[index], data);
       return;
     }
     case 'array-array': {
       obj[index].push(newValue);
-
-      const data = {
-        key: newKey,
-        type: '[Object Value Update]: create new value',
-      };
-
       editedRecordUpdateInArray(obj[index], data);
       return;
     }
-    default:
-      break;
-  }
-
-  // const newKey = `newKey-${guid()}`;
-  // if (flag.length === 0) {
-  //   if (typeof newValue === 'object' && !Array.isArray(newValue)) {
-  //     obj[newKey] = { ...newValue };
-  //   } else {
-  //     obj[newKey] = newValue;
-  //   }
-  //   console.log('object[index]', obj);
-  //
-  //   const data = {
-  //     key: newKey,
-  //     type: '[Object Value Update]: create new value',
-  //   };
-  //
-  //   editedRecordUpdateInObject(obj, data);
-  //   return;
-  // }
-  //
-  // const flagDataAndLastKey = getFlagDataAndLastKey(obj, flag);
-  // const index = flagDataAndLastKey.lastKey;
-  // obj = flagDataAndLastKey.obj;
-  //
-  // console.log('newValue', newValue);
-  // if (typeof newValue === 'object' && !Array.isArray(newValue)) {
-  //   console.log(1, obj[index]);
-  //   if (!Array.isArray(obj[index])) {
-  //     console.log(2);
-  //     obj[index][newKey] = { ...newValue };
-  //
-  //     const data = {
-  //       key: newKey,
-  //       type: '[Object Value Update]: create new value',
-  //     };
-  //
-  //     editedRecordUpdateInObject(obj[index], data);
-  //   } else {
-  //     console.log(3);
-  //     obj[index].push({ ...newValue });
-  //
-  //     const data = {
-  //       key: newKey,
-  //       type: '[Object Value Update]: create new value',
-  //     };
-  //
-  //     editedRecordUpdateInArray(obj[index], data);
-  //     return;
-  //   }
-  // } else {
-  //   console.log(1);
-  //   // object[index][newKey] = newValue;
-  //   if (!Array.isArray(obj[index])) {
-  //     obj[index][newKey] = newValue;
-  //
-  //     const data = {
-  //       key: newKey,
-  //       type: '[Object Value Update]: create new value',
-  //     };
-  //
-  //     editedRecordUpdateInObject(obj[index], data);
-  //   } else {
-  //     obj[index].push(newValue);
-  //
-  //     const data = {
-  //       key: newKey,
-  //       type: '[Object Value Update]: create new value',
-  //     };
-  //
-  //     editedRecordUpdateInArray(obj[index], data);
-  //     return;
-  //   }
-  // }
-  console.log('object[index]', obj[index]);
-}
-
-
-export function adjustValueObject(object, flag, item, type) {
-  console.log('adjustValueObject', object, flag, item, type);
-  if (flag.length === 0) {
-    object['__edited_record'] = object['__edited_record'] || [];
-    if (type === 'recover remove') {
-      object['__edited_record'] = object['__edited_record'].map(i => {
-        console.log('item', i, item);
-        if (i.key === item) {
-          i.type = 'recover remove';
-        }
-        return i;
-      });
+    case 'array-string': {
+      obj[index].push(newValue);
+      editedRecordUpdateInArray(obj[index], data);
       return;
-    } else {
-
-      const data = {
-        key: item,
-        type,
-      };
-
-      editedRecordUpdateInObject(object, data);
+    }
+    default: {
+      obj[index].push(newValue);
+      editedRecordUpdateInArray(obj[index], data);
       return;
     }
   }
+  console.log('object[index]', obj[index]);
+}
 
-  const flagDataAndLastKey = getFlagDataAndLastKey(object, flag);
-  const index = flagDataAndLastKey.lastKey;
-  object = flagDataAndLastKey.obj;
+export function adjustValueObject(object, flag, item, type) {
+  console.log('adjustValueObject', object, flag, item, type);
+  let obj = object;
+  let flagType;
+  let flagDataAndLastKey;
+  let index;
+  let newValueType;
+  const data = {
+    key: item,
+  };
 
-  const objectType = Array.isArray(object[index]) ? 'Array' : 'Object';
-  // object[index]['__edited_record'] = object[index]['__edited_record'] || [];
-  console.log('adjustValueObject');
-  if (type === 'recover remove') {
-    if (objectType === 'Object') {
-      object[index]['__edited_record'] = object[index]['__edited_record'] || [];
-      object[index]['__edited_record'] = object[index]['__edited_record'].map(i => {
+  if (flag.length === 0) {
+    flagType = 'root';
+
+    obj.__edited_record = obj.__edited_record || [];
+  } else {
+    flagDataAndLastKey = getFlagDataAndLastKey(obj, flag);
+    index = flagDataAndLastKey.lastKey;
+    obj = flagDataAndLastKey.obj;
+    console.log('obj-----', flagDataAndLastKey, typeof obj === 'object', !Array.isArray(obj));
+    flagType = (typeof obj[index] === 'object' && !Array.isArray(obj[index])) ? 'object' : 'array';
+  }
+
+  console.log('${flagType}-${type}', `${flagType}-${type}`);
+  switch (`${flagType}-${type}`) {
+    case 'root-recover remove': {
+      obj.__edited_record = obj.__edited_record.map((i) => {
         console.log('item', i, item);
-        if (i.key === item) {
-          i.type = 'recover remove';
+        const value = i;
+        if (value.key === item) {
+          value.type = 'recover remove';
         }
-        return i;
+        return value;
       });
-    } else{
-      let newEditedRecord = object[index].filter(item => {
-        if (item[0] === '__edited_record') {
+      return;
+    }
+    case 'root-remove': {
+      data.type = type;
+
+      editedRecordUpdateInObject(obj, data);
+      return;
+    }
+    case 'object-recover remove': {
+      obj[index].__edited_record = obj[index].__edited_record || [];
+      obj[index].__edited_record = obj[index].__edited_record.map((i) => {
+        const value = i;
+        if (value.key === item) {
+          value.type = 'recover remove';
+        }
+        return value;
+      });
+      return;
+    }
+    case 'object-remove': {
+      data.type = type;
+
+      editedRecordUpdateInObject(obj[index], data);
+      return;
+    }
+    case 'array-recover remove': {
+      let newEditedRecord = obj[index].filter((i) => {
+        if (i[0] === '__edited_record') {
           return true;
         }
+        return false;
       });
       if (newEditedRecord.length === 0) {
         newEditedRecord = ['__edited_record', {
@@ -421,72 +280,66 @@ export function adjustValueObject(object, flag, item, type) {
         }];
       } else {
         newEditedRecord = newEditedRecord[0];
-        const indexNumber = object[index].indexOf(newEditedRecord);
-        object[index].splice(indexNumber, 1);
+        const indexNumber = obj[index].indexOf(newEditedRecord);
+        obj[index].splice(indexNumber, 1);
       }
 
-      newEditedRecord.map(child => {
-        if (child.key === item) {
-          child.type = 'recover remove';
+      newEditedRecord.map((i) => {
+        const value = i;
+        if (value.key === item) {
+          value.type = 'recover remove';
         }
-        return child;
-      })
+        return value;
+      });
 
-      object[index].push(newEditedRecord);
-    }
-  } else {
-    if (objectType === 'Object') {
-      const data = {
-        key: item,
-        type,
-      };
-
-      editedRecordUpdateInObject(object[index], data);
+      obj[index].push(newEditedRecord);
       return;
-    } else {
+    }
+    case 'array-remove': {
+      data.type = type;
 
-      const data = {
-        key: item,
-        type,
-      };
-
-      editedRecordUpdateInArray(object[index], data);
+      editedRecordUpdateInArray(obj[index], data);
+      break;
+    }
+    default: {
+      break;
     }
   }
 }
 
 export function updateKeyObject(object, newKey, flag, item) {
+  let obj = object;
   if (newKey === item) {
     return;
   }
   if (flag.length === 0) {
-    object[newKey] = object[item];
+    obj[newKey] = obj[item];
 
     const data = {
       key: newKey,
       type: `[Object Key Update]: '${item}' convert to '${newKey}'`,
     };
 
-    editedRecordUpdateInObject(object, data);
+    editedRecordUpdateInObject(obj, data);
 
-    delete object[item];
+    delete obj[item];
 
     return;
   }
 
-  const flagDataAndLastKey = getFlagDataAndLastKey(object, flag);
+  const flagDataAndLastKey = getFlagDataAndLastKey(obj, flag);
   const index = flagDataAndLastKey.lastKey;
-  object = flagDataAndLastKey.obj;
+  obj = flagDataAndLastKey.obj;
 
-  console.log('object[index][newKey] = object[index][item];', object[index], object[index][newKey], object[index][item])
-  object[index][newKey] = object[index][item];
+  console.log('object[index][newKey] = object[index][item];', obj[index], obj[index][newKey], obj[index][item])
+  obj[index][newKey] = obj[index][item];
 
   const data = {
     key: newKey,
     type: `[Object Key Update]: '${item}' convert to '${newKey}'`,
   };
 
-  editedRecordUpdateInObject(object[index], data);
+  editedRecordUpdateInObject(obj[index], data);
 
-  delete object[index][item];
+  delete obj[index][item];
 }

@@ -6,6 +6,9 @@
             { "extensions": [".js", ".jsx"] }
         ],
         "react/forbid-prop-types": 0,
-        "no-restricted-syntax": [0, "ForOfStatement"]
+        "no-restricted-syntax": [0, "ForOfStatement"],
+        "jsx-a11y/no-static-element-interactions": 0,
+        "arrow-body-style": 0,
+        "react/no-array-index-key": 0
     }
 }
