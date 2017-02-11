@@ -9,6 +9,10 @@
         "no-restricted-syntax": [0, "ForOfStatement"],
         "jsx-a11y/no-static-element-interactions": 0,
         "arrow-body-style": 0,
-        "react/no-array-index-key": 0
+        "react/no-array-index-key": 0,
+        "no-unused-vars": [0, { "vars": "css" }],
+        "no-alert": 0,
+        "no-continue": 0,
+        "no-param-reassign": 0
     }
 }

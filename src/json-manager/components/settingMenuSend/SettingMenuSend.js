@@ -101,6 +101,14 @@ const SettingMenuSend = (props) => {
       </ul>
     </div>
   );
-}
+};
+
+SettingMenuSend.propTypes = {
+  methods: React.PropTypes.object.isRequired,
+  updateScopeSendApiType: React.PropTypes.string.isRequired,
+  modeOptionType: React.PropTypes.string.isRequired,
+  render: React.PropTypes.object.isRequired,
+  crud: React.PropTypes.object.isRequired,
+};
 
 export default SettingMenuSend;

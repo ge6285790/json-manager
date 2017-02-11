@@ -1,3 +1,5 @@
+/* eslint-env browser */
+
 import React from 'react';
 import css from './settingMenuEdit.scss';
 
@@ -50,21 +52,46 @@ const SettingMenuEdit = (props) => {
           </span>
           <br />
           <span className="type-radio">
-            <input type="radio" name="sub-type" onChange={() => { status.addSubValueType = 'Clone'; }} />
+            {/* <input type="radio" name="sub-type" onChange={() => { status.addSubValueType = 'Clone'; }} /> */}
             Clone Other
-            <input className="clone_reference" type="text" name="type" placeholder={`ex. ${editScopeFlags || '>month1'}>subkey`} onChange={(e) => { status.cloneSubValueType = e.target.value; }} />
+            <input
+              className="clone_reference"
+              type="text"
+              name="type"
+              placeholder={`ex. ${editScopeFlags || '>month1'}>subkey`}
+              onClick={() => { status.addSubValueType = 'Clone'; }}
+              onChange={(e) => { status.cloneSubValueType = e.target.value; }}
+            />
           </span>
           <br />
           <span className="type-radio float-right">
-            <span className="add-button" onClick={() => { if (!status.addSubValueType) { alert('Choice sub value type'); return; } methods.addSubValue(); }}>Add</span>
+            <span
+              className="add-button"
+              onClick={() => { methods.addSubValue(); }}
+            >
+              Add
+            </span>
           </span>
         </li>
       </ul>
       <div className="text-center">
-        <span className="json-button" onClick={() => { methods.downloadJSONFile(); }}>Download JSON file</span>
+        <span
+          className="json-button"
+          onClick={() => { methods.downloadJSONFile(); }}
+        >
+          Download JSON file
+        </span>
       </div>
     </div>
   );
-}
+};
+
+SettingMenuEdit.propTypes = {
+  methods: React.PropTypes.object.isRequired,
+  editScopeFlags: React.PropTypes.string.isRequired,
+  modeOptionType: React.PropTypes.string.isRequired,
+  status: React.PropTypes.object.isRequired,
+  render: React.PropTypes.object.isRequired,
+};
 
 export default SettingMenuEdit;

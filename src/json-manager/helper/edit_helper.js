@@ -331,7 +331,7 @@ export function updateKeyObject(object, newKey, flag, item) {
   const index = flagDataAndLastKey.lastKey;
   obj = flagDataAndLastKey.obj;
 
-  console.log('object[index][newKey] = object[index][item];', obj[index], obj[index][newKey], obj[index][item])
+  console.log('object[index][newKey] = object[index][item];', obj[index], obj[index][newKey], obj[index][item]);
   obj[index][newKey] = obj[index][item];
 
   const data = {
@@ -342,4 +342,44 @@ export function updateKeyObject(object, newKey, flag, item) {
   editedRecordUpdateInObject(obj[index], data);
 
   delete obj[index][item];
+}
+
+export function adjustData(data) {
+  let removeList;
+
+  if (typeof data === 'object' && Array.isArray(data) && data.length !== 0) {
+    if (data[data.length - 1][0] === '__edited_record') {
+      console.log('1');
+      removeList = data[data.length - 1].filter((item) => {
+        if (item.type === 'remove') {
+          return true;
+        }
+        return false;
+      });
+      removeList.map((item) => {
+        data.splice(item.key, 1);
+        return item;
+      });
+      data.pop();
+    }
+  }
+  if (typeof data === 'object' && !Array.isArray(data)) {
+    console.log('2');
+    const array = Object.keys(data);
+    for (const item of array) {
+      if (item === '__edited_record') {
+        removeList = data.__edited_record.filter((_item) => {
+          if (_item.type === 'remove') {
+            return true;
+          }
+          return false;
+        });
+        removeList.map((_item) => {
+          delete data[_item.key];
+          return _item;
+        });
+        delete data.__edited_record;
+      }
+    }
+  }
 }

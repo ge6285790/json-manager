@@ -7,12 +7,12 @@ import update from 'react-addons-update';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import request from 'superagent';
-import Dropzone from 'react-dropzone';
 import ObjectBlock from './objectBlock/ObjectBlock';
 import ArrayBlock from './arrayBlock/ArrayBlock';
 import StringBlock from './stringBlock/StringBlock';
 import SettingMenuEdit from './settingMenuEdit/SettingMenuEdit';
 import SettingMenuSend from './settingMenuSend/SettingMenuSend';
+import ImportJsonModal from './importJsonModal/ImportJsonModal';
 import * as actions from '../actions/actions';
 import * as actionsCrud from '../actions/actions_crud';
 import * as actionsMode from '../actions/actions_mode';
@@ -23,15 +23,15 @@ import * as editHelper from '../helper/edit_helper';
 console.error = (() => {
   const error = console.error;
 
-  return function (exception) {
+  return function (exception, ...args) {
     if ((`${exception}`).indexOf('Warning: A component is `contentEditable`') !== 0) {
-      error.apply(console, arguments);
+      error.apply(console, args);
     }
   };
 })();
 
 function mapStateToProps(state) {
-  console.log('state', state)
+  console.log('state', state);
   return {
     modeOption: state.modeOption,
     updateScope: state.updateScope,
@@ -52,41 +52,75 @@ function mapDispatchToProps(dispatch) {
 class Main extends Component {
   constructor(props) {
     super(props);
+
     const { option, updateScope, modeOption, jmgr, actions: act } = props;
     let { crud } = props;
-    // jsonDataEditTempRemove: this.jsonDataEditTempRemove,
+
     if (!('read' in crud)) {
       crud = jmgr.data.crud;
       act.actionsCrud.crudStateUpdate(crud);
     }
+
     this.state = {
       modeOption,
       updateScope,
       editScope: option.editScope,
       data: option.defaultData || {},
       crud,
-      // sendApi: {
-      //   type: 'update',
-      // }
     };
+
+    /*
+    common component use
+    */
     this.renderChild = this.renderChild.bind(this);
-    this.jsonDataUPDATE = this.jsonDataUPDATE.bind(this);
     this.jsonDataTempAdd = this.jsonDataTempAdd.bind(this);
     this.jsonDataEditTempAdd = this.jsonDataEditTempAdd.bind(this);
-    this.jsonDataREMOVE = this.jsonDataREMOVE.bind(this);
+    this.status = {
+      addSubValueType: 'String',
+      cloneSubValueType: '',
+    };
+    /*
+    stringBlock component use
+    */
+    this.jsonDataUPDATE = this.jsonDataUPDATE.bind(this);
+
+    /*
+    ImportJsonModal component use
+    */
     this.onDrop = this.onDrop.bind(this);
-    this.addSubValueType = 'String';
+    this.modeImportModalUpdate = this.modeImportModalUpdate.bind(this);
+    this.callReadApi = this.callReadApi.bind(this);
+
+    /*
+    SettingMenuEdit
+    SettingMenuSend
+    */
+    // this.addSubValueType = 'String';
+    // this.addSubValueType = this.addSubValueType.bind(this);
+
+    /*
+    SettingMenuEdit
+    */
     this.renderDataEditTextarea = this.renderDataEditTextarea.bind(this);
     this.renderRefernceFlagInputValue = this.renderRefernceFlagInputValue.bind(this);
+    this.editTypeUpdate = this.editTypeUpdate.bind(this);
+    this.downloadJSONFile = this.downloadJSONFile.bind(this);
 
+    /*
+    SettingMenuSend
+    */
     this.sendTypeUpdate = this.sendTypeUpdate.bind(this);
     this.sendApiTabSwitch = this.sendApiTabSwitch.bind(this);
     this.crudTypeUpdate = this.crudTypeUpdate.bind(this);
     this.crudUrlUpdate = this.crudUrlUpdate.bind(this);
     this.renderDataTextarea = this.renderDataTextarea.bind(this);
+
+    this.addSubValue = this.addSubValue.bind(this);
+    this.jsonDataREMOVE = this.jsonDataREMOVE.bind(this);
   }
 
   componentDidMount() {
+    console.log('componentDidMount');
     const { jmgr, actions: act } = this.props;
     const that = this;
     this.callReadApi();
@@ -94,8 +128,8 @@ class Main extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log('componentWillReceiveProps');
     const { option, crud, updateScope, modeOption } = nextProps;
-    console.log('componentWillReceiveProps', crud);
     this.state = {
       modeOption,
       updateScope,
@@ -105,18 +139,35 @@ class Main extends Component {
     };
   }
 
+  onDrop(acceptedFiles) { // rejectedFiles
+    console.log('onDrop');
+    const { actions: act } = this.props;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.modeImportModalUpdate('visible', 'false');
+      act.jsonDataAction.callReadApi(JSON.parse(e.target.result));
+    };
+    if (acceptedFiles[0].type !== 'application/json') {
+      alert('Only import JSON File');
+      return;
+    }
+    reader.readAsBinaryString(acceptedFiles[0]);
+  }
+
   modeTypeUpdate(type) {
+    console.log('modeTypeUpdate');
     const { actions: act } = this.props;
     act.actionsMode.modeTypeUpdate(type);
   }
 
   modeImportModalUpdate(key, value) {
+    console.log('modeImportModalUpdate');
     const { actions: act } = this.props;
     act.actionsMode.modeImportModalUpdate({ key, value });
   }
 
-
   callReadApi() {
+    console.log('callReadApi');
     const { actions: act } = this.props;
     const { crud } = this.state;
     const { url, refernceFlag, type, data } = crud.read;
@@ -180,6 +231,7 @@ class Main extends Component {
   }
 
   jsonDataUPDATE(text, refernceFlag) {
+    console.log('jsonDataUPDATE');
     let parseText = text;
     if (text.indexOf('"') === 0) {
       parseText = text.replace(/"/g, '');
@@ -195,7 +247,7 @@ class Main extends Component {
   }
 
   jsonDataREMOVE(refernceFlagArray, item) {
-    console.log('refernceFlagArray, item', refernceFlagArray, item);
+    console.log('jsonDataREMOVE');
     const { actions: act } = this.props;
     // const newState = Object.assign(this.state.data, {});
     const newState = { ...this.state.data };
@@ -213,68 +265,52 @@ class Main extends Component {
   }
 
   jsonDataKeyUPDATE(text, refernceFlagArray, item) {
-    // const parseText = text.replace(/"/g, '');
+    console.log('jsonDataKeyUPDATE');
     const { actions: act } = this.props;
-    // const refernceFlagArray = refernceFlag.split('>');
-    // refernceFlagArray.shift();
-    // const item = refernceFlagArray.pop();
-    // const newState = Object.assign(this.state.data, {});
     const newState = { ...this.state.data };
 
-
     editHelper.updateKeyObject(newState, text, refernceFlagArray, item);
-    console.log('newState', newState);
-
 
     act.jsonDataAction.jsonDataUPDATE(newState);
   }
 
   crudUrlUpdate(type, url) {
+    console.log('crudUrlUpdate');
     const { actions: act } = this.props;
     act.actionsCrud.crudUrlUpdate({ type, url });
   }
 
   crudTypeUpdate(type, crudType) {
+    console.log('crudTypeUpdate');
     const { actions: act } = this.props;
     act.actionsCrud.crudTypeUpdate({ type, crudType });
   }
 
   jsonDataTempAdd(flag) {
+    console.log('jsonDataTempAdd');
     const { actions: act } = this.props;
     if (this.state.updateScope.flags.indexOf(flag) > -1) {
       return;
     }
-    console.log('--flag', flag);
     act.jsonDataAction.jsonDataTempAdd(flag);
   }
 
   jsonDataTempRemove(index) {
+    console.log('jsonDataTempRemove');
     const { actions: act } = this.props;
     act.jsonDataAction.jsonDataTempRemove(index);
   }
 
   jsonDataEditTempAdd(flag) {
+    console.log('jsonDataEditTempAdd');
     const { actions: act } = this.props;
-    // if (this.state.updateScope.flags.indexOf(flag) > -1) {
-    //   return;
-    // }
-    console.log('--flag', flag);
     act.jsonDataAction.jsonDataEditTempAdd(flag);
   }
 
-  // jsonDataEditTempRemove(index) {
-  //   const { actions: act } = this.props;
-  //   act.jsonDataAction.jsonDataEditTempRemove();
-  // }
-  //
-  // jsonDataEditor() {
-  //   return this.state;
-  // }
-
   addSubValue() {
+    console.log('addSubValue');
     const { editScope, data } = this.state;
-    const addSubValueType = this.addSubValueType;
-    console.log('addSubValueType', addSubValueType, editScope);
+    const addSubValueType = this.status.addSubValueType;
     const { actions: act } = this.props;
     let refernceFlagArray = [];
     if (editScope.flags) {
@@ -295,15 +331,13 @@ class Main extends Component {
         break;
       }
       case 'Clone': {
-        let cloneSubValueType = this.cloneSubValueType;
+        let cloneSubValueType = this.status.cloneSubValueType;
         cloneSubValueType = cloneSubValueType.split('>');
         cloneSubValueType.shift();
-        // newValue = Object.assign({}, data);
         newValue = { ...data };
         for (const item of cloneSubValueType) {
           newValue = newValue[item];
         }
-        console.log('newValue----', newValue);
         break;
       }
       default: {
@@ -314,101 +348,11 @@ class Main extends Component {
 
     editHelper.addObject(newState, newValue, refernceFlagArray);
 
-    console.log('addObject newState', newState);
     act.jsonDataAction.jsonDataUPDATE(newState);
   }
 
-  // editTypeUpdate(type) {
-  //   const { actions: act } = this.props;
-  //   const { editScope, data } = this.state;
-  //   console.log('editScope', editScope, type);
-  //   const refernceFlagArray = editScope.flags.split('>');
-  //   refernceFlagArray.shift();
-  //   console.log('refernceFlagArray', refernceFlagArray);
-  //   let flagValue = data;
-  //   let newValue;
-  //   if (type === 'Object') {
-  //     newValue = {};
-  //     for (const item of refernceFlagArray) {
-  //       flagValue = flagValue[item];
-  //     }
-  //     if (typeof flagValue === 'object' && !Array.isArray(flagValue)) {
-  //       return;
-  //     }
-  //     console.log('flagValue', flagValue);
-  //     if (Array.isArray(flagValue)) {
-  //       flagValue.forEach(function(data, i){
-  //         console.log('data', data)
-  //         if (data[0] === '__edited_record') {
-  //           data.shift();
-  //           newValue['__edited_record'] = data;
-  //         } else {
-  //           newValue[i] = data;
-  //         }
-  //
-  //       });
-  //     } else {
-  //       newValue[0] = flagValue;
-  //     }
-  //     // goback
-  //   }
-  //   if (type === 'Array') {
-  //     newValue = [];
-  //     for (const item of refernceFlagArray) {
-  //       flagValue = flagValue[item];
-  //     }
-  //     console.log('flagValue1', flagValue);
-  //     if (Array.isArray(flagValue)) {
-  //       return;
-  //     }
-  //     if (typeof flagValue === 'object'){
-  //       console.log('flagValue2', flagValue);
-  //       for (const item in flagValue) {
-  //         if (item === '__edited_record') {
-  //           console.log(flagValue['__edited_record'])
-  //           flagValue['__edited_record'].unshift('__edited_record');
-  //           newValue.push(flagValue['__edited_record']);
-  //           continue;
-  //         }
-  //         newValue.push(flagValue[item]);
-  //       }
-  //     } else {
-  //       newValue.push(flagValue);
-  //     }
-  //     // goback
-  //   }
-  //   if (type === 'String') {
-  //     newValue = '';
-  //     for (const item of refernceFlagArray) {
-  //       flagValue = flagValue[item];
-  //     }
-  //     if (typeof flagValue === 'number' || typeof flagValue === 'string') {
-  //       return;
-  //     }
-  //     console.log('flagValue', flagValue);
-  //     newValue = JSON.stringify(flagValue);
-  //     // if (typeof flagValue === 'object'){
-  //     //   console.log('flagValue', flagValue);
-  //     //   for (const item in flagValue) {
-  //     //     newValue.push(flagValue[item]);
-  //     //   }
-  //     // } else {
-  //     //   newValue.push(flagValue);
-  //     // }
-  //     // goback
-  //   }
-  //   console.log('newValue', newValue);
-  //
-  //   // const newState = Object.assign(this.state.data, {});
-  //   const newState = { ...this.state.data };
-  //
-  //
-  //   editHelper.updateObject(newState, newValue, refernceFlagArray);
-  //
-  //   act.jsonDataAction.jsonDataUPDATE(newState);
-  // }
-
   editTypeUpdate(type) {
+    console.log('editTypeUpdate');
     const { actions: act } = this.props;
     const { editScope, data } = this.state;
     const refernceFlagArray = editScope.flags.split('>');
@@ -439,13 +383,12 @@ class Main extends Component {
       newValue = '';
     }
 
-    console.log('${type}-${flagType}', `${type}-${flagType}`);
+    // console.log('${type}-${flagType}', `${type}-${flagType}`);
 
     switch (`${type}-${flagType}`) {
 
       case 'Object-array': {
         flagValue.forEach((_data, i) => {
-          console.log('data', _data);
           if (_data[0] === '__edited_record') {
             _data.shift();
             newValue.__edited_record = _data;
@@ -463,7 +406,6 @@ class Main extends Component {
       case 'Array-object': {
         for (const item in flagValue) {
           if (item === '__edited_record') {
-            console.log(flagValue.__edited_record);
             flagValue.__edited_record.unshift('__edited_record');
             newValue.push(flagValue.__edited_record);
             continue;
@@ -495,8 +437,6 @@ class Main extends Component {
       }
     }
 
-    console.log('newValue', newValue);
-
     // const newState = Object.assign(this.state.data, {});
     const newState = { ...this.state.data };
 
@@ -507,25 +447,26 @@ class Main extends Component {
   }
 
   sendTypeUpdate(type) {
+    console.log('sendTypeUpdate');
     const { actions: act } = this.props;
     act.jsonDataAction.sendTypeUpdate(type);
   }
 
   sendApiTabSwitch(tab) {
+    console.log('sendApiTabSwitch');
     const { actions: act } = this.props;
     act.jsonDataAction.sendApiTabSwitch(tab);
   }
 
   downloadJSONFile() {
+    console.log('downloadJSONFile');
     const { data } = this.state;
     const parseData = { ...data };
     this.parseData(parseData);
-    console.log(parseData);
 
     const json = JSON.stringify(parseData);
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-    console.log(url);
     window.open = url;
 
     if (document.getElementById('json-file')) {
@@ -543,7 +484,8 @@ class Main extends Component {
   }
 
   parseData(data) {
-    this.adjustData(data);
+    console.log('parseData');
+    editHelper.adjustData(data);
     if (typeof data === 'object' && Array.isArray(data)) {
       data.map((item) => {
         this.parseData(item);
@@ -558,64 +500,8 @@ class Main extends Component {
     }
   }
 
-  adjustData(data) {
-    let removeList;
-
-    if (typeof data === 'object' && Array.isArray(data) && data.length !== 0) {
-      if (data[data.length - 1][0] === '__edited_record') {
-        console.log('1');
-        removeList = data[data.length - 1].filter((item) => {
-          if (item.type === 'remove') {
-            return true;
-          }
-          return false;
-        });
-        removeList.map((item) => {
-          data.splice(item.key, 1);
-          return item;
-        });
-        data.pop();
-      }
-    }
-    if (typeof data === 'object' && !Array.isArray(data)) {
-      console.log('2');
-      const array = Object.keys(data);
-      for (const item of array) {
-        if (item === '__edited_record') {
-          removeList = data.__edited_record.filter((_item) => {
-            if (_item.type === 'remove') {
-              return true;
-            }
-            return false;
-          });
-          removeList.map((_item) => {
-            delete data[_item.key];
-            return _item;
-          });
-          delete data.__edited_record;
-        }
-      }
-    }
-  }
-
-  onDrop(acceptedFiles) { // rejectedFiles
-    const { actions: act } = this.props;
-    console.log('act', act);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      this.modeImportModalUpdate('visible', 'false');
-      act.jsonDataAction.callReadApi(JSON.parse(e.target.result));
-    };
-    // console.log('acceptedFiles[0].preview', acceptedFiles[0].preview);
-    console.log('----acceptedFiles[0]', acceptedFiles[0]);
-    if (acceptedFiles[0].type !== 'application/json') {
-      alert('Only import JSON File');
-      return;
-    }
-    reader.readAsBinaryString(acceptedFiles[0]);
-  }
-
   renderChild(data, blockType, refernceFlag, modeOptionType) {
+    console.log('renderChild');
     const isArray = Array.isArray(data);
     let array = Object.keys(data);
     let keyTitle;
@@ -682,7 +568,6 @@ class Main extends Component {
         case 'array': {
           // removed = removeEditRecord.indexOf(i) > -1 ? 'removed' : '';
           // console.log('array removed', removeEditRecord, i, removed)
-          console.log('array item', item, key, key[0])
           keyTitle = blockType === 'array' && item !== '__edited_record' ? '' : item;
           const editedRecord = key[0] === '__edited_record' ? '__edited_record' : '';
           return (
@@ -736,6 +621,7 @@ class Main extends Component {
   }
 
   renderRefernceFlagInputValue() {
+    console.log('renderRefernceFlagInputValue');
     const { updateScope } = this.state;
     if (updateScope.flags.length === 0) {
       return (
@@ -756,21 +642,14 @@ class Main extends Component {
     });
   }
 
-  // renderRefernceEditFlagInputValue() {
-  //   const { editScope } = this.state;
-  //   return (
-  //     <span className="flags" key={'Choice the key...editScope'}>{editScope.flags || 'Choice the key...'}</span>
-  //   );
-  // }
-
   renderDataTextarea() {
+    console.log('renderDataTextarea');
     const { updateScope, data } = this.state;
     const type = updateScope.sendType;
     if (updateScope.flags.length === 0) {
       return '';
     }
 
-    console.log('updateScope.flags', updateScope.flags);
     let flagArray = updateScope.flags.map((item) => {
       const array = item.split('>');
       let jsonData = data;
@@ -779,15 +658,12 @@ class Main extends Component {
         // console.log('send', jsonData[i], jsonData[i]['__edited_record']);
         jsonData = jsonData[i];
       }
-      console.log('jsonData', jsonData);
       if (Array.isArray(jsonData) && typeof jsonData === 'object') {
         jsonData = [...jsonData];
-        console.log('jsonData----', jsonData)
         jsonData.splice(jsonData.indexOf('__edited_record'), 1);
       } else if (typeof jsonData === 'object') {
-        jsonData = {...jsonData};
-        console.log('jsonData----1', jsonData)
-        delete jsonData['__edited_record'];
+        jsonData = { ...jsonData };
+        delete jsonData.__edited_record;
       }
       if (type === 'Object') {
         return `"${array.pop()}":${JSON.stringify(jsonData)}`;
@@ -798,7 +674,6 @@ class Main extends Component {
       return [prev, <span key={new Date() + Math.random()}><br /><br /></span>, next];
     });
     // flagArray = [flagArray];
-    console.log('flagArray', flagArray)
     if (type === 'Object') {
       flagArray = Array.isArray[flagArray] ? flagArray : [flagArray];
       flagArray.unshift(<br key={new Date() + Math.random()} />);
@@ -821,7 +696,7 @@ class Main extends Component {
   }
 
   renderDataEditTextarea() {
-    console.log('1---');
+    console.log('renderDataEditTextarea');
     const { updateScope, data, editScope } = this.state;
     let jsonData = data;
     let array = [];
@@ -841,28 +716,24 @@ class Main extends Component {
       }
     }
     // jsonDataRECOVER
-    console.log('jsonData', jsonData);
     if (typeof jsonData === 'object' && Array.isArray(jsonData)) {
       removeEditRecord = [];
-      if(jsonData.__edited_record){
-        removeEditRecord = jsonData.__edited_record.map(item => {
+      if (jsonData.__edited_record) {
+        removeEditRecord = jsonData.__edited_record.map((item) => {
           if (item.type === 'remove') {
             return item.key;
           }
-
         });
       } else {
-
         if (Array.isArray(jsonData[jsonData.length - 1])) {
           removeEditRecord = jsonData[jsonData.length - 1];
-          removeEditRecord = removeEditRecord.filter(item => {
+          removeEditRecord = removeEditRecord.filter((item) => {
             if (item.type === 'remove') {
               return true;
             }
+            return false;
           });
-          removeEditRecord = removeEditRecord.map(item => {
-            return item.key;
-          });
+          removeEditRecord = removeEditRecord.map(item => item.key);
         }
       }
       //   return array   //
@@ -870,7 +741,7 @@ class Main extends Component {
         if (item[0] === '__edited_record') {
           return '';
         }
-        const removed = removeEditRecord.indexOf(i) > -1 ? true : false;
+        const removed = removeEditRecord.indexOf(i) > -1;
         return (
           <span
             key={`array${i}`}
@@ -901,12 +772,12 @@ class Main extends Component {
       return jsonData;
     } else if (typeof jsonData === 'object') {
       if (jsonData.__edited_record) {
-        removeEditRecord = jsonData.__edited_record.map(item => {
+        removeEditRecord = jsonData.__edited_record.map((item) => {
           if (item.type === 'remove') {
             return item.key;
           }
           if (item[0] === '__edited_record') {
-            const childArray = item.map(i => {
+            const childArray = item.map((i) => {
               if (i.type === 'remove') {
                 return i.key;
               }
@@ -924,8 +795,7 @@ class Main extends Component {
         });
       }
       jsonData = result.map((item, i) => {
-        const removed = removeEditRecord.indexOf(item.item) > -1 ? true : false;
-        console.log('jsonData removed', removed)
+        const removed = removeEditRecord.indexOf(item.item) > -1;
         if (item.item === '__edited_record') {
           return '';
         }
@@ -965,13 +835,9 @@ class Main extends Component {
     //   return string   //
     const item = array.pop();
     let removed = false;
-    console.log('array, item', array, item, stringParent);
     if (stringParent.__edited_record) {
-      stringParent = stringParent.__edited_record.filter(i => {
-        return i.type === 'remove' ? true : false;
-      });
-      console.log('stringParent', stringParent);
-      stringParent.map(i => {
+      stringParent = stringParent.__edited_record.filter(i => i.type === 'remove');
+      stringParent.map((i) => {
         if (i.key === item) {
           removed = true;
         }
@@ -983,10 +849,6 @@ class Main extends Component {
         key={'stringjsonData'}
       >
         [{typeof jsonData}]
-        {/* <span
-          className="remove-edit"
-          onClick={() => { this.jsonDataREMOVE(array, item); }}
-        >×</span> */}
         <span
           className="remove-edit"
           onClick={() => {
@@ -1004,16 +866,12 @@ class Main extends Component {
   }
 
   render() {
+    console.log('render');
     const { actions: act } = this.props;
     const { data, updateScope, crud, modeOption, editScope } = this.state;
     const blockType = Array.isArray(data) ? 'array' : 'default';
-    const { importModal, type } = modeOption;
+    const { importModal } = modeOption;
 
-    console.log('modeOption', modeOption, crud);
-    // let refernceFlagInputValue = '';
-    // if (updateScope.flags.length !== 0) {
-    //   refernceFlagInputValue = updateScope.flags.reduce((prev, next) => `${prev}, ${next}`);
-    // }
     return (
       <div className="json-manager" data-theme="dark">
         <div className="mode">
@@ -1022,6 +880,7 @@ class Main extends Component {
         </div>
         <button
           className="import-json-button"
+          /* eslint no-unused-expressions: ["error", { "allowTernary": true }] */
           onClick={() => { importModal.visible === 'true' ? this.modeImportModalUpdate('visible', 'false') : this.modeImportModalUpdate('visible', 'true'); }}
         >
           Import JSON By API / FILE
@@ -1040,11 +899,9 @@ class Main extends Component {
             editTypeUpdate: this.editTypeUpdate,
             addSubValue: this.addSubValue,
             downloadJSONFile: this.downloadJSONFile,
-          }}
-          status={{
             addSubValueType: this.addSubValueType,
-            cloneSubValueType: this.cloneSubValueType,
           }}
+          status={this.status}
           render={{
             renderDataEditTextarea: this.renderDataEditTextarea,
           }}
@@ -1059,11 +916,7 @@ class Main extends Component {
             sendApiTabSwitch: this.sendApiTabSwitch,
             crudTypeUpdate: this.crudTypeUpdate,
             crudUrlUpdate: this.crudUrlUpdate,
-          }}
-          status={{
             addSubValueType: this.addSubValueType,
-            cloneSubValueType: this.cloneSubValueType,
-
           }}
           crud={crud}
           render={{
@@ -1072,41 +925,20 @@ class Main extends Component {
           }}
         />
 
-        <div className="import-json-modal text-center" data-active={importModal.visible}>
-          <div className="modal-body text-left">
-            <h3>Import JSON</h3>
-            <div className="switch-tag clearfix">
-              <div className="tag" data-active={importModal.type === 'api' ? 'true' : 'false'} onClick={() => { this.modeImportModalUpdate('type', 'api'); }}>API</div>
-              <div className="tag" data-active={importModal.type === 'file' ? 'true' : 'false'} onClick={() => { this.modeImportModalUpdate('type', 'file'); }}>FILE</div>
-            </div>
-            <div className="get-json-by-api" data-active={importModal.type === 'api' ? 'true' : 'false'}>
-              <div className="api-type">
-                <select defaultValue={crud.read.type} onChange={(e) => { act.actionsCrud.crudTypeUpdate({ type: 'read', crudType: e.target.value }); }}>
-                  <option value="GET">GET</option>
-                  <option value="POST">POST</option>
-                </select>
-                <input defaultValue={crud.read.url} onBlur={(e) => { act.actionsCrud.crudUrlUpdate({ type: 'read', url: e.target.value }); }} />
-              </div>
-              <div className="post-data">
-                <p>POST data：</p>
-                <textarea onChange={(e) => { act.actionsCrud.crudDataUpdate({ type: 'read', value: e.target.value }); }} defaultValue="{}"></textarea>
-              </div>
-              <p className="showError" data-active={crud.response === '' ? 'false' : 'true'}>*{crud.response}</p>
-              <div className="api-send">
-                <div onClick={() => { this.callReadApi(); }}>Send</div>
-              </div>
-            </div>
-            <div className="get-json-by-drop" data-active={importModal.type === 'file' ? 'true' : 'false'}>
-              <div className="file-data">
-                <div className="paddingBottom" />
-                <Dropzone className="dropzone" onDrop={this.onDrop} style={{width: '100%', height: '100%', position: 'absolute', top: '0px', left: '0px'}}>
-                  <div className="text-center">dropping JSON File here.</div>
-                </Dropzone>
-              </div>
-            </div>
-            <div className="close" onClick={() => { this.modeImportModalUpdate('visible', 'false'); }}>×</div>
-          </div>
-        </div>
+
+        <ImportJsonModal
+          importModal={importModal}
+          methods={{
+            modeImportModalUpdate: this.modeImportModalUpdate,
+            callReadApi: this.callReadApi,
+            onDrop: this.onDrop,
+          }}
+          actions={{
+            actionsCrud: act.actionsCrud,
+          }}
+          crud={crud}
+        />
+
       </div>
     );
   }
@@ -1117,6 +949,8 @@ Main.propTypes = {
   crud: React.PropTypes.object.isRequired,
   actions: React.PropTypes.object.isRequired,
   updateScope: React.PropTypes.object.isRequired,
+  modeOption: React.PropTypes.object.isRequired,
+  jmgr: React.PropTypes.object.isRequired,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Main);
