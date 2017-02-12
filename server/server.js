@@ -45,6 +45,7 @@ if (process.env.NODE_ENV === 'development') {
   var WebpackHotMiddleware = require('webpack-hot-middleware');
   var config = require('../webpack.dev.config');
   var compiler = webpack(config);
+  app.use(WebpackHotMiddleware(compiler));
   app.use(WebpackDevMiddleware(compiler, {
     noInfo: true,
     publicPath: config.output.publicPath,
@@ -56,7 +57,7 @@ var PORT = process.env.PORT || 8000;
 
 
 
-app.use(WebpackHotMiddleware(compiler));
+
 
 app.use('/assets', express.static(__dirname + '/../public'));
 
