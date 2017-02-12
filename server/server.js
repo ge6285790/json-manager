@@ -30,12 +30,11 @@
 //   console.log(`Listening on ${PORT}`);
 // });
 
+//  配合heroku，暫時先以舊寫法撰寫
+
 var express = require('express');
 
 var cool = require('cool-ascii-faces');
-
-
-
 
 var app = express();
 
@@ -54,10 +53,6 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 var PORT = process.env.PORT || 8000;
-
-
-
-
 
 app.use('/assets', express.static(__dirname + '/../public'));
 
