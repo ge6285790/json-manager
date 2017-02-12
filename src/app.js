@@ -139,12 +139,12 @@ const option = {
   },
   crud: {
     create: {
-      url: 'https://store.readmoo.com/api/reading17/get',
+      url: '',
       type: 'POST',
       data: {},
     },
     read: {
-      url: 'https://store.readmoo.com/api/reading17/get',
+      url: '',
       type: 'GET',
       data: {},
       refernceFlag: '',
