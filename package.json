@@ -1,6 +1,6 @@
 {
   "name": "json-manager",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "json management",
   "main": "app.js",
   "repository": {
@@ -80,6 +80,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cross-env NODE_ENV=development node -r babel-register ./server/server.js",
     "build": "NODE_ENV=production webpack -p --config webpack.prod.config.js",
-    "start": "node server.js"
+    "start": "node ./server/server.js"
   }
 }
