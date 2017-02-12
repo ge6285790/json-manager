@@ -59,7 +59,7 @@ var PORT = process.env.PORT || 8000;
 
 
 
-app.use('/assets', express.static(__dirname + '/../public/assets'));
+app.use('/assets', express.static(__dirname + '/../public'));
 
 app.get('/cool', (req, res) => {
   // console.log('aaaa');
