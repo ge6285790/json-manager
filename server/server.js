@@ -2,7 +2,9 @@ import express from 'express';
 import webpack from 'webpack';
 import WebpackDevMiddleware from 'webpack-dev-middleware';
 import WebpackHotMiddleware from 'webpack-hot-middleware';
+import cool from 'cool-ascii-faces';
 import config from '../webpack.dev.config';
+
 
 const compiler = webpack(config);
 const app = express();
@@ -19,10 +21,10 @@ app.use(WebpackHotMiddleware(compiler));
 
 app.use('/assets', express.static(__dirname + '/../public'));
 
-// app.get('/', (req, res) => {
-//   // console.log('aaaa');
-//   res.send(req);
-// });
+app.get('/cool', (req, res) => {
+  // console.log('aaaa');
+  res.send(cool());
+});
 
 app.listen(PORT, () => {
   console.log(`Listening on ${PORT}`);
