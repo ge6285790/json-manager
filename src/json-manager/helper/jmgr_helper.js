@@ -91,7 +91,7 @@ export default function jmgrHelper(jmgr, act, that) {
     },
 
     create: () => {
-      console.log('create');
+      that.callUpdateApi('create');
     },
 
     read: () => {
@@ -99,16 +99,16 @@ export default function jmgrHelper(jmgr, act, that) {
     },
 
     update: () => {
-      console.log('update');
+      that.callUpdateApi('update');
     },
 
     delete: () => {
-      console.log('delete');
+      that.callUpdateApi('delete');
     },
   };
 
-  jmgr.modeChange = () => {
-    console.log('modeChange');
+  jmgr.modeChange = (mode) => {
+    that.modeTypeUpdate(mode);
   };
 
   jmgr.importJSON = () => {
@@ -116,28 +116,38 @@ export default function jmgrHelper(jmgr, act, that) {
   };
 
   jmgr.exportJSON = () => {
-    console.log('export');
+    that.downloadJSONFile();
+  };
+
+  jmgr.send = {
+    flagSelect: (string) => {
+      console.log('flagSelect');
+      that.jsonDataTempAdd(string);
+    },
   };
 
   jmgr.edit = {
-    flagSelect: () => {
-      console.log('flagSelect');
+    flagSelect: (string) => {
+      that.jsonDataEditTempAdd(string);
     },
 
-    typeChange: () => {
-      console.log('typeChange');
+    typeChange: (type) => { // upper
+      that.editTypeUpdate(type);
     },
 
-    create: () => {
-      console.log('create');
+    create: (type) => { // upper
+      that.status.addSubValueType = type;
+      that.addSubValue();
     },
 
-    remove: () => {
-      console.log('remove');
+    remove: (array, anchor) => {
+      that.jsonDataREMOVE(array, anchor);
+      // json1.edit.remove(['month1'], 1)
+      // json1.edit.remove(['month1',0], 'day')
     },
 
-    recover: () => {
-      console.log('recover');
+    recover: (array, key) => {
+      that.jsonDataRECOVER(array, key);
     },
   };
 }

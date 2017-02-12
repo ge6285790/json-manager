@@ -2,7 +2,6 @@ import React from 'react';
 import css from './settingMenuSend.scss';
 
 const SettingMenuSend = (props) => {
-  console.log('SettingMenuSend', props);
   const { render, methods, crud, modeOptionType, updateScopeSendApiType } = props;
   return (
     <div className="setting-menu-send" data-active={modeOptionType === 'send' ? 'true' : 'false'} >
@@ -68,7 +67,7 @@ const SettingMenuSend = (props) => {
                 <input placeholder="Update API URL" value={crud.update.url} onChange={(e) => { methods.crudUrlUpdate('update', e.target.value); }} />
               </div>
               <div className="api-send">
-                <div>Send</div>
+                <div onClick={() => { methods.callUpdateApi('update'); }}>Send</div>
               </div>
             </div>
             <div data-active={updateScopeSendApiType === 'create' ? 'true' : ''} className="create">
@@ -80,7 +79,7 @@ const SettingMenuSend = (props) => {
                 <input placeholder="Create API URL" value={crud.create.url} onChange={(e) => { methods.crudUrlUpdate('create', e.target.value); }} />
               </div>
               <div className="api-send">
-                <div>Send</div>
+                <div onClick={() => { methods.callUpdateApi('create'); }}>Send</div>
               </div>
             </div>
             <div data-active={updateScopeSendApiType === 'delete' ? 'true' : ''} className="delete">
@@ -93,7 +92,7 @@ const SettingMenuSend = (props) => {
                 <input placeholder="Delete API URL" value={crud.delete.url} onChange={(e) => { methods.crudUrlUpdate('delete', e.target.value); }} />
               </div>
               <div className="api-send">
-                <div>Send</div>
+                <div onClick={() => { methods.callUpdateApi('delete'); }}>Send</div>
               </div>
             </div>
           </div>

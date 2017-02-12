@@ -13,6 +13,7 @@
         "no-unused-vars": [0, { "vars": "css" }],
         "no-alert": 0,
         "no-continue": 0,
-        "no-param-reassign": 0
+        "no-param-reassign": 0,
+        "no-eval": 0
     }
 }

@@ -31,7 +31,7 @@ console.error = (() => {
 })();
 
 function mapStateToProps(state) {
-  console.log('state', state);
+  // console.log('state', state);
   return {
     modeOption: state.modeOption,
     updateScope: state.updateScope,
@@ -114,13 +114,14 @@ class Main extends Component {
     this.crudTypeUpdate = this.crudTypeUpdate.bind(this);
     this.crudUrlUpdate = this.crudUrlUpdate.bind(this);
     this.renderDataTextarea = this.renderDataTextarea.bind(this);
+    this.callUpdateApi = this.callUpdateApi.bind(this);
 
     this.addSubValue = this.addSubValue.bind(this);
     this.jsonDataREMOVE = this.jsonDataREMOVE.bind(this);
   }
 
   componentDidMount() {
-    console.log('componentDidMount');
+    // console.log('componentDidMount');
     const { jmgr, actions: act } = this.props;
     const that = this;
     this.callReadApi();
@@ -128,7 +129,7 @@ class Main extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log('componentWillReceiveProps');
+    // console.log('componentWillReceiveProps');
     const { option, crud, updateScope, modeOption } = nextProps;
     this.state = {
       modeOption,
@@ -140,7 +141,7 @@ class Main extends Component {
   }
 
   onDrop(acceptedFiles) { // rejectedFiles
-    console.log('onDrop');
+    // console.log('onDrop');
     const { actions: act } = this.props;
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -155,19 +156,19 @@ class Main extends Component {
   }
 
   modeTypeUpdate(type) {
-    console.log('modeTypeUpdate');
+    // console.log('modeTypeUpdate');
     const { actions: act } = this.props;
     act.actionsMode.modeTypeUpdate(type);
   }
 
   modeImportModalUpdate(key, value) {
-    console.log('modeImportModalUpdate');
+    // console.log('modeImportModalUpdate');
     const { actions: act } = this.props;
     act.actionsMode.modeImportModalUpdate({ key, value });
   }
 
   callReadApi() {
-    console.log('callReadApi');
+    // console.log('callReadApi');
     const { actions: act } = this.props;
     const { crud } = this.state;
     const { url, refernceFlag, type, data } = crud.read;
@@ -230,8 +231,60 @@ class Main extends Component {
       });
   }
 
+  callUpdateApi(crudType) {
+    const { actions: act } = this.props;
+    const { crud } = this.state;
+    const { url, type } = crud[crudType];
+    const innerText = document.querySelectorAll('.textarea')[1].innerText;
+    if (!innerText || innerText === '') {
+      alert('Choice key');
+      return;
+    }
+    const convertToObject = eval(`(${document.querySelectorAll('.textarea')[1].innerText})`);
+    const data = JSON.stringify(convertToObject);
+    if (url === '') {
+      return;
+    }
+    if (type === 'GET') {
+      request.get(url)
+        .set('Accept', 'application/json')
+        .send(data)
+        .end((err, res) => {
+          if (err || res.status !== 200) {
+            // console.log(new Error(err));
+            alert((err).toString());
+            return;
+          }
+          alert('Success');
+        });
+      return;
+    } else if (type === 'POST') {
+      request.post(url)
+        .set('Accept', 'application/json')
+        .send(data)
+        .end((err, res) => {
+          if (err || res.status !== 200) {
+            alert((err).toString());
+            return;
+          }
+          alert('Success');
+        });
+      return;
+    }
+    request.delete(url)
+      .set('Accept', 'application/json')
+      .send(data)
+      .end((err, res) => {
+        if (err || res.status !== 200) {
+          alert((err).toString());
+          return;
+        }
+        alert('Success');
+      });
+  }
+
   jsonDataUPDATE(text, refernceFlag) {
-    console.log('jsonDataUPDATE');
+    // console.log('jsonDataUPDATE');
     let parseText = text;
     if (text.indexOf('"') === 0) {
       parseText = text.replace(/"/g, '');
@@ -247,7 +300,7 @@ class Main extends Component {
   }
 
   jsonDataREMOVE(refernceFlagArray, item) {
-    console.log('jsonDataREMOVE');
+    // console.log('jsonDataREMOVE');
     const { actions: act } = this.props;
     // const newState = Object.assign(this.state.data, {});
     const newState = { ...this.state.data };
@@ -256,7 +309,7 @@ class Main extends Component {
   }
 
   jsonDataRECOVER(refernceFlagArray, item) {
-    console.log('jsonDataRECOVER');
+    // console.log('jsonDataRECOVER');
     const { actions: act } = this.props;
     // const newState = Object.assign(this.state.data, {});
     const newState = { ...this.state.data };
@@ -265,7 +318,7 @@ class Main extends Component {
   }
 
   jsonDataKeyUPDATE(text, refernceFlagArray, item) {
-    console.log('jsonDataKeyUPDATE');
+    // console.log('jsonDataKeyUPDATE');
     const { actions: act } = this.props;
     const newState = { ...this.state.data };
 
@@ -275,19 +328,19 @@ class Main extends Component {
   }
 
   crudUrlUpdate(type, url) {
-    console.log('crudUrlUpdate');
+    // console.log('crudUrlUpdate');
     const { actions: act } = this.props;
     act.actionsCrud.crudUrlUpdate({ type, url });
   }
 
   crudTypeUpdate(type, crudType) {
-    console.log('crudTypeUpdate');
+    // console.log('crudTypeUpdate');
     const { actions: act } = this.props;
     act.actionsCrud.crudTypeUpdate({ type, crudType });
   }
 
   jsonDataTempAdd(flag) {
-    console.log('jsonDataTempAdd');
+    // console.log('jsonDataTempAdd');
     const { actions: act } = this.props;
     if (this.state.updateScope.flags.indexOf(flag) > -1) {
       return;
@@ -296,19 +349,19 @@ class Main extends Component {
   }
 
   jsonDataTempRemove(index) {
-    console.log('jsonDataTempRemove');
+    // console.log('jsonDataTempRemove');
     const { actions: act } = this.props;
     act.jsonDataAction.jsonDataTempRemove(index);
   }
 
   jsonDataEditTempAdd(flag) {
-    console.log('jsonDataEditTempAdd');
+    // console.log('jsonDataEditTempAdd');
     const { actions: act } = this.props;
     act.jsonDataAction.jsonDataEditTempAdd(flag);
   }
 
   addSubValue() {
-    console.log('addSubValue');
+    // console.log('addSubValue');
     const { editScope, data } = this.state;
     const addSubValueType = this.status.addSubValueType;
     const { actions: act } = this.props;
@@ -352,7 +405,7 @@ class Main extends Component {
   }
 
   editTypeUpdate(type) {
-    console.log('editTypeUpdate');
+    // console.log('editTypeUpdate');
     const { actions: act } = this.props;
     const { editScope, data } = this.state;
     const refernceFlagArray = editScope.flags.split('>');
@@ -369,7 +422,7 @@ class Main extends Component {
       flagType = 'object';
     } else if (typeof flagValue === 'object' && Array.isArray(flagValue)) {
       flagType = 'array';
-    } else if (typeof flagValue === 'string') {
+    } else if (typeof flagValue === 'string' || typeof flagValue === 'number') {
       flagType = 'string';
     } else {
       flagType = typeof flagValue;
@@ -447,19 +500,19 @@ class Main extends Component {
   }
 
   sendTypeUpdate(type) {
-    console.log('sendTypeUpdate');
+    // console.log('sendTypeUpdate');
     const { actions: act } = this.props;
     act.jsonDataAction.sendTypeUpdate(type);
   }
 
   sendApiTabSwitch(tab) {
-    console.log('sendApiTabSwitch');
+    // console.log('sendApiTabSwitch');
     const { actions: act } = this.props;
     act.jsonDataAction.sendApiTabSwitch(tab);
   }
 
   downloadJSONFile() {
-    console.log('downloadJSONFile');
+    // console.log('downloadJSONFile');
     const { data } = this.state;
     const parseData = { ...data };
     this.parseData(parseData);
@@ -484,7 +537,7 @@ class Main extends Component {
   }
 
   parseData(data) {
-    console.log('parseData');
+    // console.log('parseData');
     editHelper.adjustData(data);
     if (typeof data === 'object' && Array.isArray(data)) {
       data.map((item) => {
@@ -501,7 +554,7 @@ class Main extends Component {
   }
 
   renderChild(data, blockType, refernceFlag, modeOptionType) {
-    console.log('renderChild');
+    // console.log('renderChild');
     const isArray = Array.isArray(data);
     let array = Object.keys(data);
     let keyTitle;
@@ -621,7 +674,7 @@ class Main extends Component {
   }
 
   renderRefernceFlagInputValue() {
-    console.log('renderRefernceFlagInputValue');
+    // console.log('renderRefernceFlagInputValue');
     const { updateScope } = this.state;
     if (updateScope.flags.length === 0) {
       return (
@@ -643,7 +696,7 @@ class Main extends Component {
   }
 
   renderDataTextarea() {
-    console.log('renderDataTextarea');
+    // console.log('renderDataTextarea');
     const { updateScope, data } = this.state;
     const type = updateScope.sendType;
     if (updateScope.flags.length === 0) {
@@ -696,7 +749,7 @@ class Main extends Component {
   }
 
   renderDataEditTextarea() {
-    console.log('renderDataEditTextarea');
+    // console.log('renderDataEditTextarea');
     const { updateScope, data, editScope } = this.state;
     let jsonData = data;
     let array = [];
@@ -724,17 +777,17 @@ class Main extends Component {
             return item.key;
           }
         });
-      } else {
-        if (Array.isArray(jsonData[jsonData.length - 1])) {
-          removeEditRecord = jsonData[jsonData.length - 1];
-          removeEditRecord = removeEditRecord.filter((item) => {
-            if (item.type === 'remove') {
-              return true;
-            }
-            return false;
-          });
-          removeEditRecord = removeEditRecord.map(item => item.key);
-        }
+      } else if (Array.isArray(jsonData[jsonData.length - 1])) {
+        // if (Array.isArray(jsonData[jsonData.length - 1])) {
+        removeEditRecord = jsonData[jsonData.length - 1];
+        removeEditRecord = removeEditRecord.filter((item) => {
+          if (item.type === 'remove') {
+            return true;
+          }
+          return false;
+        });
+        removeEditRecord = removeEditRecord.map(item => item.key);
+        // }
       }
       //   return array   //
       jsonData = jsonData.map((item, i) => {
@@ -866,7 +919,7 @@ class Main extends Component {
   }
 
   render() {
-    console.log('render');
+    // console.log('render');
     const { actions: act } = this.props;
     const { data, updateScope, crud, modeOption, editScope } = this.state;
     const blockType = Array.isArray(data) ? 'array' : 'default';
@@ -917,6 +970,7 @@ class Main extends Component {
             crudTypeUpdate: this.crudTypeUpdate,
             crudUrlUpdate: this.crudUrlUpdate,
             addSubValueType: this.addSubValueType,
+            callUpdateApi: this.callUpdateApi,
           }}
           crud={crud}
           render={{
