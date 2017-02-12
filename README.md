@@ -1,7 +1,3 @@
-# Json-Manger
-
-**JSON visualization editor** , you use this project to do
-
 Json-Manager — JSON 視覺化管理介面
 ================================
 **====================**
@@ -10,9 +6,11 @@ Json-Manager — JSON 視覺化管理介面
 
 **====================**
 
+<br/>
+<br/>
 使用線上 JSON 管理介面：Demo
 
-####一. 簡介
+##一. 簡介
 
 JSON 視覺化管理介面，透過操作介面可完成：
 
@@ -28,15 +26,15 @@ JSON 視覺化管理介面，透過操作介面可完成：
 
 
 
-####二. 安裝
+##二. 安裝
 
 	npm install json-manager --save
 
-####三. 用法
+##三. 用法
 
 將 json-manager 導入專案內，給其原始設定資訊後將其實體化，便會產生 React Template 塞入 Dom 結構中。
 
-####四. 範例
+##四. 範例
 
 ```jsx
 /* import json-manager to project */
@@ -81,7 +79,7 @@ const json = new Jmgr(option);
 
 ```
 
-####五. API
+##五. API
 
 如果需要透過其他介面來進行操作，則可參考下方提供API：
 
@@ -112,6 +110,6 @@ json.edit.recover(array, anchor) | 回覆被移除的 key/index from Object/Arra
 
 
 
-####License
+##License
 
 MIT
