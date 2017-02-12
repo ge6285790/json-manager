@@ -7,6 +7,9 @@
     "type": "git",
     "url": "git+https://github.com/ge6285790/json-manager.git"
   },
+  "engines": {
+    "node": "v7.2.1"
+  },
   "keywords": [
     "json",
     "manager",
