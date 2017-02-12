@@ -124,7 +124,9 @@ class Main extends Component {
     // console.log('componentDidMount');
     const { jmgr, actions: act } = this.props;
     const that = this;
-    this.callReadApi();
+    // this.callReadApi();
+    console.log('jmgr', jmgr);
+    act.jsonDataAction.jsonDataUPDATE(jmgr.data.defaultData);
     jmgrHelper(jmgr, act, that);
   }
 
@@ -937,6 +939,13 @@ class Main extends Component {
           onClick={() => { importModal.visible === 'true' ? this.modeImportModalUpdate('visible', 'false') : this.modeImportModalUpdate('visible', 'true'); }}
         >
           Import JSON By API / FILE
+        </button>
+        <button
+          className="reset-json-button"
+          /* eslint no-unused-expressions: ["error", { "allowTernary": true }] */
+          onClick={() => { act.jsonDataAction.jsonDataUPDATE({}); }}
+        >
+          Rest JSON Data to empty data
         </button>
         <ObjectBlock
           data={data}

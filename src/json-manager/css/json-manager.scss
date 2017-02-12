@@ -59,7 +59,7 @@
       }
     }
   }
-  .import-json-button{
+  .import-json-button, .reset-json-button{
     position: fixed;
     z-index: 2;
     top: 60px;
@@ -92,6 +92,9 @@
       border-radius: 3px;
       padding: 0px 6px;
     }
+  }
+  .reset-json-button{
+    top: 88px;
   }
   .string-child{
     margin: 6px 0px 6px 36px;
@@ -142,6 +145,7 @@
     }
   }
   .setting-menu-send, .setting-menu-edit{
+    overflow: auto;
     height: 100%;
     width: 360px;
     background: #000;

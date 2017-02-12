@@ -59,6 +59,7 @@
   },
   "dependencies": {
     "deep-equal": "^1.0.1",
+    "extract-text-webpack-plugin": "^1.0.1",
     "material-ui": "^0.16.7",
     "passport": "^0.3.2",
     "passport-linkedin-oauth2": "^1.4.1",
@@ -71,10 +72,12 @@
     "react-modal": "^1.6.5",
     "react-redux": "^5.0.2",
     "redux": "^3.6.0",
-    "superagent": "^3.3.2"
+    "superagent": "^3.3.2",
+    "webpack-strip": "^0.1.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "cross-env NODE_ENV=development node -r babel-register ./server/server.js"
+    "dev": "cross-env NODE_ENV=development node -r babel-register ./server/server.js",
+    "build": "NODE_ENV=production webpack -p --config webpack.prod.config.js"
   }
 }
