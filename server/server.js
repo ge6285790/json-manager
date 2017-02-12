@@ -31,23 +31,30 @@
 // });
 
 var express = require('express');
-var webpack = require('webpack');
-var WebpackDevMiddleware = require('webpack-dev-middleware');
-var WebpackHotMiddleware = require('webpack-hot-middleware');
+
 var cool = require('cool-ascii-faces');
-var config = require('../webpack.dev.config');
 
 
-var compiler = webpack(config);
+
+
 var app = express();
+
+if (process.env.NODE_ENV === 'development') {
+  var webpack = require('webpack');
+  var WebpackDevMiddleware = require('webpack-dev-middleware');
+  var WebpackHotMiddleware = require('webpack-hot-middleware');
+  var config = require('../webpack.dev.config');
+  var compiler = webpack(config);
+  app.use(WebpackDevMiddleware(compiler, {
+    noInfo: true,
+    publicPath: config.output.publicPath,
+    stats: { color: true },
+  }));
+}
 
 var PORT = process.env.PORT || 8000;
 
-app.use(WebpackDevMiddleware(compiler, {
-  noInfo: true,
-  publicPath: config.output.publicPath,
-  stats: { color: true },
-}));
+
 
 app.use(WebpackHotMiddleware(compiler));
 
