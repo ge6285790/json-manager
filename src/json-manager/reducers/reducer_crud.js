@@ -1,36 +1,5 @@
-import * as types from '../constants/constants_crud';
 import update from 'react-addons-update';
-
-const crud = {
-  // if don't, just let it empty, default is false
-  create: {
-    url: 'https://store.readmoo.com/api/reading17/get',
-    // url: 'https://www.youtube.com/feed_ajax?action_get_unseen_notification_count=1',
-    type: 'POST',
-    data: {},
-  },
-  read: {
-    url: 'https://store.readmoo.com/api/reading17/get',
-    // url: 'https://www.youtube.com/feed_ajax?action_get_unseen_notification_count=1',
-    type: 'GET',
-    data: {},
-    refernceFlag: '',
-  },
-  update: {
-    url: 'cc',
-    type: 'GET',
-    data: {},
-    // refernceFlag: '>month1>arrayIndex>day',
-    // id: 'day', // default '';
-  },
-  delete: {
-    url: 'dd',
-    type: 'GET',
-    data: {},
-    // refernceFlag: 'title>id',
-  },
-  response: '',
-};
+import * as types from '../constants/constants_crud';
 
 export default function (state = {}, action) {
   switch (action.type) {

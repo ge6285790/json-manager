@@ -1,30 +1,8 @@
-import * as types from '../constants/actionTypes';
 import update from 'react-addons-update';
+import * as types from '../constants/actionTypes';
 
 const option = {
   defaultData: {
-    // t: {
-    //   b: {
-    //     cc: 'aa',
-    //   },
-    //   v: {
-    //     aa: 'v',
-    //   },
-    //   a: [
-    //     'ccc',
-    //     'eee',
-    //     {
-    //       pp: {
-    //         bbbb: [
-    //           1,
-    //           'bb',
-    //           'rr',
-    //         ],
-    //       },
-    //       oooo: 'iii',
-    //     },
-    //   ],
-    // },
   },
   addMethod: 'liberty', // inherit
   // updateFlags: [],

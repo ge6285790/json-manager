@@ -1,6 +1,6 @@
 {
   "name": "json-manager",
-  "version": "0.9.8",
+  "version": "0.9.9",
   "description": "json management",
   "main": "app.js",
   "repository": {

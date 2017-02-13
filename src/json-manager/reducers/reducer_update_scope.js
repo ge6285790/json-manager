@@ -1,5 +1,5 @@
-import * as types from '../constants/actionTypes';
 import update from 'react-addons-update';
+import * as types from '../constants/actionTypes';
 
 const initialize = {
   flags: [],
@@ -8,8 +8,6 @@ const initialize = {
     type: 'update',
   },
   sendType: 'default',
-  // sendType: 'Object',
-  // sendType: 'Array',
 };
 
 export default function (state = initialize, action) {
